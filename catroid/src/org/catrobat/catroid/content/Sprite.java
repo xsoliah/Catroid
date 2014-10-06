@@ -170,6 +170,7 @@ public class Sprite implements Serializable, Cloneable {
 			if (script instanceof BroadcastScript) {
 				BroadcastScript broadcastScript = (BroadcastScript) script;
 				SequenceAction action = createActionSequence(broadcastScript);
+
 				if(addextra){
 					look.addAction(action);
 				}
