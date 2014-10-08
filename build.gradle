@@ -1,5 +1,4 @@
 import java.util.regex.Pattern
-import com.android.build.gradle.tasks.PackageApplication
 
 buildscript {
     repositories {
@@ -17,7 +16,6 @@ repositories {
 }
 
 apply plugin: 'android-sdk-manager'
-apply plugin: 'android'
 apply plugin: 'com.android.application'
 apply plugin: 'checkstyle'
 apply plugin: 'pmd'
