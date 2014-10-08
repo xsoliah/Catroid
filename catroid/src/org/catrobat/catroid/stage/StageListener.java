@@ -219,7 +219,7 @@ public class StageListener implements ApplicationListener {
 		}
 	}
 
-	public void menuPause() {
+	void menuPause() {
 		if (finished || reloadProject) {
 			return;
 		}
