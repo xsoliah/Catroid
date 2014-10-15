@@ -50,6 +50,7 @@ import org.catrobat.catroid.exceptions.OutdatedVersionProjectException;
 import org.catrobat.catroid.io.LoadProjectTask;
 import org.catrobat.catroid.io.LoadProjectTask.OnLoadProjectCompleteListener;
 import org.catrobat.catroid.io.StorageHandler;
+import org.catrobat.catroid.livewallpaper.ProjectManagerState;
 import org.catrobat.catroid.transfers.CheckTokenTask;
 import org.catrobat.catroid.transfers.CheckTokenTask.OnCheckTokenCompleteListener;
 import org.catrobat.catroid.ui.dialogs.LoginRegisterDialog;
@@ -60,6 +61,8 @@ import org.catrobat.catroid.web.ServerCalls;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public final class ProjectManager implements OnLoadProjectCompleteListener, OnCheckTokenCompleteListener {
 	private static final ProjectManager INSTANCE = new ProjectManager();
@@ -70,6 +73,11 @@ public final class ProjectManager implements OnLoadProjectCompleteListener, OnCh
 	private Sprite currentSprite;
 	private UserBrick currentUserBrick;
 	private boolean asynchronTask = true;
+	private static ProjectManagerState currentProjectManagerState = ProjectManagerState.NORMAL;
+
+	public static void changeState(ProjectManagerState state) {
+		currentProjectManagerState = state;
+	}
 
 	private FileChecksumContainer fileChecksumContainer = new FileChecksumContainer();
 
@@ -100,7 +108,7 @@ public final class ProjectManager implements OnLoadProjectCompleteListener, OnCh
 		}
 	}
 
-	public void loadProject(String projectName, Context context) throws LoadingProjectException,
+	public Project loadProject(String projectName, Context context) throws LoadingProjectException,
 			OutdatedVersionProjectException, CompatibilityProjectException {
 		fileChecksumContainer = new FileChecksumContainer();
 		Project oldProject = project;
@@ -157,7 +165,9 @@ public final class ProjectManager implements OnLoadProjectCompleteListener, OnCh
 				throw new CompatibilityProjectException(context.getString(R.string.error_project_compatability));
 			}
 		}
+		Project newProject = project;
 
+		return newProject;
 	}
 
 	private void localizeBackgroundSprite(Context context) {
@@ -181,6 +191,15 @@ public final class ProjectManager implements OnLoadProjectCompleteListener, OnCh
 	}
 
 	public void saveProject() {
+		if (project == null) {
+
+			return;
+		}
+		saveWithoutLock();
+
+	}
+
+	public void saveWithoutLock(){
 		if (project == null) {
 			return;
 		}
@@ -238,7 +257,8 @@ public final class ProjectManager implements OnLoadProjectCompleteListener, OnCh
 	}
 
 	public Project getCurrentProject() {
-		return project;
+		Project lockme = project;
+		return lockme;
 	}
 
 	public void setProject(Project project) {
@@ -302,7 +322,7 @@ public final class ProjectManager implements OnLoadProjectCompleteListener, OnCh
 
 		if (directoryRenamed) {
 			project.setName(newProjectName);
-			saveProject();
+			saveWithoutLock();
 		}
 
 		if (!directoryRenamed) {
@@ -387,6 +407,16 @@ public final class ProjectManager implements OnLoadProjectCompleteListener, OnCh
 
 	public void setFileChecksumContainer(FileChecksumContainer fileChecksumContainer) {
 		this.fileChecksumContainer = fileChecksumContainer;
+	}
+
+	private class SaveProjectAsynchronousTask extends AsyncTask<Void, Void, Void> {
+
+		@Override
+		protected Void doInBackground(Void... params) {
+			Project saveme = project;
+			StorageHandler.getInstance().saveProject(saveme);
+			return null;
+		}
 	}
 
 	@Override

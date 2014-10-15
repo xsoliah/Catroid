@@ -58,6 +58,7 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.utils.GdxNativesLoader;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 
+import org.catrobat.catroid.ProjectHandler;
 import org.catrobat.catroid.ProjectManager;
 import org.catrobat.catroid.R;
 import org.catrobat.catroid.common.Constants;
@@ -306,6 +307,30 @@ public final class Utils {
 			}
 
 		}
+		ProjectHandler.getInstance().setPocketCodeProject(newProject);
+
+	}
+
+	public static void loadWallpaperIfNeeded(Context context) {
+		Project newProject = ProjectManager.getInstance().getCurrentProject();
+		if ( newProject == null) {
+			SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+			String projectName = sharedPreferences.getString(Constants.PREF_LWP_PROJECTNAME_KEY, null);
+
+			if (projectName == null) {
+				projectName = context.getString(R.string.default_project_name);
+			}
+
+			try {
+				newProject = ProjectManager.getInstance().loadProject(projectName, context);
+			} catch (ProjectException projectException) {
+				Log.e(TAG, "Project cannot load", projectException);
+				ProjectManager.getInstance().initializeDefaultProject(context);
+			}
+
+		}
+		ProjectHandler.getInstance().setLiveWallpaperProject(newProject);
+
 	}
 
 	public static String getCurrentProjectName(Context context) {

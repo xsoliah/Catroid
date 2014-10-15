@@ -58,7 +58,7 @@ public final class Constants {
 	public static final int NO_POSITION = -1;
 
 	//Broadcast system:
-	public static final String ACTION_SPRITE_SEPARATOR = "#";
+	public static final String ACTION_SEPARATOR = "#";
 	public static final String BROADCAST_NOTIFY_ACTION = "broadcast_notify";
 	public static final String START_SCRIPT = "start_script";
 	public static final String BROADCAST_SCRIPT = "broadcast_script";
@@ -90,6 +90,7 @@ public final class Constants {
 	//Various:
 	public static final int BUFFER_8K = 8 * 1024;
 	public static final String PREF_PROJECTNAME_KEY = "projectName";
+	public static final String PREF_LWP_PROJECTNAME_KEY = "lwpProjectName";
 	public static final String PROJECTNAME_TO_LOAD = "projectNameToLoad";
 	public static final String PROJECT_OPENED_FROM_PROJECTS_LIST = "projectList";
 
@@ -99,6 +100,13 @@ public final class Constants {
 	public static final int UPLOAD_NOTIFICATION = 102;
 	public static final int DOWNLOAD_NOTIFICATION = 103;
 	public static final int COPY_NOTIFICATION = 104;
+
+	//Livewallpaper
+	public static final String PREF_SOUND_DISABLED = "Sound disabled";
+	public static final String PREF_SOUND_ENABLED = "Sound enabled";
+	public static final String POCKET_CODE_PACKAGE_NAME = "org.catrobat.catroid.livewallpaper";
+	public static final String POCKET_CODE_INTENT_ACTIVITY_NAME = "org.catrobat.catroid.livewallpaper.ui.SelectProgramActivity";
+	public static final String POCKET_CODE_DOWNLOAD_LINK = "market://details?id=" + POCKET_CODE_PACKAGE_NAME;
 
 	// Suppress default constructor for noninstantiability
 	private Constants() {
