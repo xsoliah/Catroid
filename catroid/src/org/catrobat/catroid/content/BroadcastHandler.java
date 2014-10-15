@@ -47,7 +47,7 @@ public final class BroadcastHandler {
 	private static HashMap<String, Action> stringActionMap = new HashMap<String, Action>();
 
 	private static final String TAG = "BroadcastHandler";
-
+	private static int StageID;
 	private BroadcastHandler() {
 		throw new AssertionError();
 	}

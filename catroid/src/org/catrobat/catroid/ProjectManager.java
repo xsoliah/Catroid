@@ -525,13 +525,4 @@ public final class ProjectManager implements OnLoadProjectCompleteListener, OnCh
 			}
 		}
 	}
-
-	private class SaveProjectAsynchronousTask extends AsyncTask<Void, Void, Void> {
-
-		@Override
-		protected Void doInBackground(Void... params) {
-			StorageHandler.getInstance().saveProject(project);
-			return null;
-		}
-	}
 }
