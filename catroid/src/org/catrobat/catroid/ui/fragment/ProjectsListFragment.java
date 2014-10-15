@@ -50,6 +50,7 @@ import com.actionbarsherlock.app.SherlockListFragment;
 import com.actionbarsherlock.view.ActionMode;
 import com.actionbarsherlock.view.Menu;
 
+import org.catrobat.catroid.ProjectHandler;
 import org.catrobat.catroid.ProjectManager;
 import org.catrobat.catroid.R;
 import org.catrobat.catroid.common.Constants;
@@ -104,110 +105,8 @@ public class ProjectsListFragment extends SherlockListFragment implements OnProj
 	private View selectAllActionModeButton;
 
 	private boolean actionModeActive = false;
-	private ActionMode.Callback deleteModeCallBack = new ActionMode.Callback() {
-		@Override
-		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-			return false;
-		}
 
-		@Override
-		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-			setSelectMode(ListView.CHOICE_MODE_MULTIPLE);
 
-			actionModeActive = true;
-
-			deleteActionModeTitle = getString(R.string.delete);
-			singleItemAppendixDeleteActionMode = getString(R.string.program);
-			multipleItemAppendixDeleteActionMode = getString(R.string.programs);
-
-			mode.setTitle(deleteActionModeTitle);
-			addSelectAllActionModeButton(mode, menu);
-
-			return true;
-		}
-
-		@Override
-		public boolean onActionItemClicked(ActionMode mode, com.actionbarsherlock.view.MenuItem item) {
-			return false;
-		}
-
-		@Override
-		public void onDestroyActionMode(ActionMode mode) {
-			if (adapter.getAmountOfCheckedProjects() == 0) {
-				clearCheckedProjectsAndEnableButtons();
-			} else {
-				showConfirmDeleteDialog();
-			}
-		}
-	};
-	private ActionMode.Callback renameModeCallBack = new ActionMode.Callback() {
-
-		@Override
-		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-			return false;
-		}
-
-		@Override
-		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-			setSelectMode(ListView.CHOICE_MODE_SINGLE);
-			mode.setTitle(R.string.rename);
-
-			actionModeActive = true;
-
-			return true;
-		}
-
-		@Override
-		public boolean onActionItemClicked(ActionMode mode, com.actionbarsherlock.view.MenuItem item) {
-			return false;
-		}
-
-		@Override
-		public void onDestroyActionMode(ActionMode mode) {
-			Set<Integer> checkedSprites = adapter.getCheckedProjects();
-			Iterator<Integer> iterator = checkedSprites.iterator();
-			if (iterator.hasNext()) {
-				int position = iterator.next();
-				projectToEdit = (ProjectData) getListView().getItemAtPosition(position);
-				showRenameDialog();
-			}
-			clearCheckedProjectsAndEnableButtons();
-		}
-	};
-	private ActionMode.Callback copyModeCallBack = new ActionMode.Callback() {
-
-		@Override
-		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-			return false;
-		}
-
-		@Override
-		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-			setSelectMode(ListView.CHOICE_MODE_SINGLE);
-			mode.setTitle(R.string.copy);
-
-			actionModeActive = true;
-
-			return true;
-		}
-
-		@Override
-		public boolean onActionItemClicked(ActionMode mode, com.actionbarsherlock.view.MenuItem item) {
-			return false;
-		}
-
-		@Override
-		public void onDestroyActionMode(ActionMode mode) {
-			Set<Integer> checkedSprites = adapter.getCheckedProjects();
-			Iterator<Integer> iterator = checkedSprites.iterator();
-			if (iterator.hasNext()) {
-				int position = iterator.next();
-				projectToEdit = (ProjectData) getListView().getItemAtPosition(position);
-				showCopyProjectDialog();
-			}
-			clearCheckedProjectsAndEnableButtons();
-		}
-	};
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -302,13 +201,14 @@ public class ProjectsListFragment extends SherlockListFragment implements OnProj
 		adapter.notifyDataSetChanged();
 	}
 
-	public int getSelectMode() {
-		return adapter.getSelectMode();
-	}
 
 	public void setSelectMode(int selectMode) {
 		adapter.setSelectMode(selectMode);
 		adapter.notifyDataSetChanged();
+	}
+
+	public int getSelectMode() {
+		return adapter.getSelectMode();
 	}
 
 	public boolean getActionModeActive() {
@@ -354,6 +254,7 @@ public class ProjectsListFragment extends SherlockListFragment implements OnProj
 		if (currentProject == null) {
 			try {
 				ProjectManager.getInstance().loadProject(projectToEdit.projectName, getActivity());
+				ProjectHandler.getInstance().setPocketCodeProject(newProject);
 			} catch (LoadingProjectException loadingProjectException) {
 				Log.e(TAG, "Project cannot load", loadingProjectException);
 				Utils.showErrorDialog(getActivity(), R.string.error_load_project);
@@ -580,6 +481,113 @@ public class ProjectsListFragment extends SherlockListFragment implements OnProj
 
 		});
 	}
+
+	private ActionMode.Callback deleteModeCallBack = new ActionMode.Callback() {
+		@Override
+		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+			return false;
+		}
+
+		@Override
+		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+			setSelectMode(ListView.CHOICE_MODE_MULTIPLE);
+
+			actionModeActive = true;
+
+			deleteActionModeTitle = getString(R.string.delete);
+			singleItemAppendixDeleteActionMode = getString(R.string.program);
+			multipleItemAppendixDeleteActionMode = getString(R.string.programs);
+
+			mode.setTitle(deleteActionModeTitle);
+			addSelectAllActionModeButton(mode, menu);
+
+			return true;
+		}
+
+		@Override
+		public boolean onActionItemClicked(ActionMode mode, com.actionbarsherlock.view.MenuItem item) {
+			return false;
+		}
+
+		@Override
+		public void onDestroyActionMode(ActionMode mode) {
+			if (adapter.getAmountOfCheckedProjects() == 0) {
+				clearCheckedProjectsAndEnableButtons();
+			} else {
+				showConfirmDeleteDialog();
+			}
+		}
+	};
+
+	private ActionMode.Callback renameModeCallBack = new ActionMode.Callback() {
+
+		@Override
+		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+			return false;
+		}
+
+		@Override
+		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+			setSelectMode(ListView.CHOICE_MODE_SINGLE);
+			mode.setTitle(R.string.rename);
+
+			actionModeActive = true;
+
+			return true;
+		}
+
+		@Override
+		public boolean onActionItemClicked(ActionMode mode, com.actionbarsherlock.view.MenuItem item) {
+			return false;
+		}
+
+		@Override
+		public void onDestroyActionMode(ActionMode mode) {
+			Set<Integer> checkedSprites = adapter.getCheckedProjects();
+			Iterator<Integer> iterator = checkedSprites.iterator();
+			if (iterator.hasNext()) {
+				int position = iterator.next();
+				projectToEdit = (ProjectData) getListView().getItemAtPosition(position);
+				showRenameDialog();
+			}
+			clearCheckedProjectsAndEnableButtons();
+		}
+	};
+
+	private ActionMode.Callback copyModeCallBack = new ActionMode.Callback() {
+
+		@Override
+		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+			return false;
+		}
+
+		@Override
+		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+			setSelectMode(ListView.CHOICE_MODE_SINGLE);
+			mode.setTitle(R.string.copy);
+
+			actionModeActive = true;
+
+			return true;
+		}
+
+		@Override
+		public boolean onActionItemClicked(ActionMode mode, com.actionbarsherlock.view.MenuItem item) {
+			return false;
+		}
+
+		@Override
+		public void onDestroyActionMode(ActionMode mode) {
+			Set<Integer> checkedSprites = adapter.getCheckedProjects();
+			Iterator<Integer> iterator = checkedSprites.iterator();
+			if (iterator.hasNext()) {
+				int position = iterator.next();
+				projectToEdit = (ProjectData) getListView().getItemAtPosition(position);
+				showCopyProjectDialog();
+			}
+			clearCheckedProjectsAndEnableButtons();
+		}
+	};
 
 	private class ProjectListInitReceiver extends BroadcastReceiver {
 		@Override

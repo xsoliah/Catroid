@@ -77,6 +77,7 @@ public class StageActivity extends AndroidApplication {
 		}
 
 		stageAudioFocus = new StageAudioFocus(this);
+		ProjectHandler.getInstance().setPocketCodeStageActivity(this);
 	}
 
 	@Override

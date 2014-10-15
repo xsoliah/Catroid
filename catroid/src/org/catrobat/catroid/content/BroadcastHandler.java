@@ -118,7 +118,7 @@ public final class BroadcastHandler {
 			Script receiverScript = actionScriptMap.get(action);
 			actionScriptMap.put(broadcastWaitAction, receiverScript);
 			Sprite receiverSprite = scriptSpriteMap.get(receiverScript);
-			String actionName = broadcastWaitAction.toString() + Constants.ACTION_SPRITE_SEPARATOR + receiverSprite.getName() + receiverSprite.getScriptIndex(receiverScript);
+			String actionName = broadcastWaitAction.toString() + Constants.ACTION_SEPARATOR + receiverSprite.getName() + receiverSprite.getScriptIndex(receiverScript)+ Constants.ACTION_SEPARATOR + StageID;
 			stringActionMap.put(actionName, broadcastWaitAction);
 			if (!handleActionFromBroadcastWait(look, broadcastWaitAction)) {
 				event.raiseNumberOfReceivers();
@@ -133,7 +133,7 @@ public final class BroadcastHandler {
 
 	private static boolean handleAction(Action action, Script scriptOfAction) {
 		Sprite spriteOfAction = scriptSpriteMap.get(scriptOfAction);
-		String actionToHandle = action.toString() + Constants.ACTION_SPRITE_SEPARATOR + spriteOfAction.getName() + spriteOfAction.getScriptIndex(scriptOfAction);
+		String actionToHandle = action.toString() + Constants.ACTION_SEPARATOR + spriteOfAction.getName() + spriteOfAction.getScriptIndex(scriptOfAction)+ Constants.ACTION_SEPARATOR + StageID;
 
 		if (!actionsToRestartMap.containsKey(actionToHandle)) {
 			return false;
@@ -187,6 +187,11 @@ public final class BroadcastHandler {
 		actionsToRestartMap.clear();
 		actionScriptMap.clear();
 		stringActionMap.clear();
+	}
+
+	public static void setStageID(int ID)
+	{
+		StageID = ID;
 	}
 
 	public static Multimap<String, String> getActionsToRestartMap() {

@@ -124,8 +124,8 @@ public class StageDialog extends Dialog implements View.OnClickListener {
 		}
 	}
 
-	private void restartProject() {
-		stageListener.reloadProject(this);
+	public void restartProject() {
+		stageListener.reloadProject(stageActivity, this);
 		synchronized (this) {
 			try {
 				this.wait();
