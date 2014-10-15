@@ -24,20 +24,15 @@ package org.catrobat.catroid.livewallpaper.ui;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.app.Notification;
-import android.app.WallpaperManager;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.service.wallpaper.WallpaperService;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -63,7 +58,6 @@ import org.catrobat.catroid.io.SoundManager;
 import org.catrobat.catroid.io.StorageHandler;
 import org.catrobat.catroid.livewallpaper.LiveWallpaper;
 import org.catrobat.catroid.livewallpaper.LoadWallpaperTask;
-import org.catrobat.catroid.ui.MainMenuActivity;
 import org.catrobat.catroid.ui.MyProjectsActivity;
 import org.catrobat.catroid.ui.adapter.ProjectAdapter;
 import org.catrobat.catroid.ui.adapter.ProjectAdapter.OnProjectEditListener;
@@ -72,6 +66,7 @@ import org.catrobat.catroid.utils.UtilFile;
 import org.catrobat.catroid.utils.Utils;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -460,8 +455,12 @@ public class SelectProgramFragment extends SherlockListFragment implements OnPro
 	}
 
 	private void deleteProject() {
-		StorageHandler.getInstance().deleteProject(projectToEdit);
-		projectList.remove(projectToEdit);
+        try {
+            StorageHandler.getInstance().deleteProject(projectToEdit.projectName);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        projectList.remove(projectToEdit);
 	}
 
 	private void initAdapter() {

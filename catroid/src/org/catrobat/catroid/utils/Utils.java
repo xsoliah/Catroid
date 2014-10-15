@@ -291,7 +291,8 @@ public final class Utils {
 	}
 
 	public static void loadProjectIfNeeded(Context context) {
-		if (ProjectManager.getInstance().getCurrentProject() == null) {
+		Project newProject = ProjectManager.getInstance().getCurrentProject();
+		if ( newProject == null) {
 			SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 			String projectName = sharedPreferences.getString(Constants.PREF_PROJECTNAME_KEY, null);
 
@@ -300,7 +301,7 @@ public final class Utils {
 			}
 
 			try {
-				ProjectManager.getInstance().loadProject(projectName, context);
+				newProject = ProjectManager.getInstance().loadProject(projectName, context);
 			} catch (ProjectException projectException) {
 				Log.e(TAG, "Project cannot load", projectException);
 				ProjectManager.getInstance().initializeDefaultProject(context);

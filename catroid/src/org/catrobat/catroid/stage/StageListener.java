@@ -320,7 +320,7 @@ public class StageListener implements ApplicationListener, AndroidWallpaperListe
 		FaceDetectionHandler.pauseFaceDetection();
 	}
 
-	void menuResume() {
+	public void menuResume() {
 		if (reloadProject) {
 			return;
 		}

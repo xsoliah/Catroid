@@ -53,6 +53,7 @@ import org.catrobat.catroid.drone.DroneInitializer;
 import org.catrobat.catroid.facedetection.FaceDetectionHandler;
 import org.catrobat.catroid.legonxt.LegoNXT;
 import org.catrobat.catroid.legonxt.LegoNXTBtCommunicator;
+import org.catrobat.catroid.livewallpaper.ClearLiveWallpaper;
 import org.catrobat.catroid.ui.BaseActivity;
 import org.catrobat.catroid.ui.dialogs.CustomAlertDialogBuilder;
 import org.catrobat.catroid.utils.LedUtil;
@@ -425,7 +426,7 @@ public class PreStageActivity extends BaseActivity {
 		}
 	}
 
-	public static int initTextToSpeechForLiveWallpaper(Context context) {
+	public int initTextToSpeechForLiveWallpaper(Context context) {
 		if (getRequiredRessources() == Brick.TEXT_TO_SPEECH && textToSpeech == null) {
 			textToSpeech = new TextToSpeech(context, new OnInitListener() {
 				@Override
