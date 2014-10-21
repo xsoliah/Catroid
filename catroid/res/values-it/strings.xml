@@ -23,7 +23,7 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <resources>
-  <string name="app_name">Pocket Code</string>
+  <string name="app_name">Pocket Code LiveWallpaper</string>
   <string name="cancel_button">Annulla</string>
   <string name="rename">Rinomina</string>
   <string name="delete">Eliminare</string>
