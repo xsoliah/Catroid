@@ -113,7 +113,8 @@ android {
     defaultConfig {
         minSdkVersion 10
         targetSdkVersion 19
-        applicationId 'org.catrobat.catroid'
+        applicationId 'org.catrobat.catroidLWP' +
+                ''
         testApplicationId "org.catrobat.catroid.test"
         testInstrumentationRunner 'pl.polidea.instrumentation.PolideaInstrumentationTestRunner'
         versionCode getBuildNumberParameter()
