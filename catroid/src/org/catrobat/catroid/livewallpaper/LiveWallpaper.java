@@ -368,8 +368,10 @@ public class LiveWallpaper extends AndroidLiveWallpaperService {
 			}
 
 			if (isPreview()) {
+                Log.d("LWP", "set preview engine");
 				setPreviewEngine(this);
 			} else {
+                Log.d("LWP", "set home engine");
 				setHomeEngine(this);
 			}
 

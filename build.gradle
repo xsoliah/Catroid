@@ -28,7 +28,7 @@ check.dependsOn 'pmd'
 
 ext {
     projectVersion = "0.9"
-    gdxVersion = '1.2.0'
+    gdxVersion = '1.5.4'
     roboVMVersion = '0.0.14'
     featuresEnabled = [
             "lego_nxt"                          : true,

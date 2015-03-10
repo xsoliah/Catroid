@@ -632,7 +632,8 @@ public final class UI {
 		stage.draw();
 
 		if( DebugUI ) {
-			Table.drawDebug( stage );
+            stage.setDebugAll(true);
+			//Table.drawDebug( stage );
 		}
 	}
 
