@@ -352,7 +352,8 @@ public class LiveWallpaper extends AndroidLiveWallpaperService {
 		};
 
 		public LiveWallpaperEngine() {
-			super();
+            super();
+            Log.d("LWP", "-------------------------LiveWallpaperengine Constructor!");
 		}
 
 		@Override
@@ -367,6 +368,22 @@ public class LiveWallpaper extends AndroidLiveWallpaperService {
 				Log.d("LWP", "Preview Engine erstellt (nicht zum ersten Mal) und Home Engine wurde nie erstellt");
 			}
 
+            if(previewEngine == null)
+                Log.d("LWP", "previewEngine is null");
+            else
+                Log.d("LWP", "previewEngine is NOT null");
+
+            if(homeEngine == null)
+                Log.d("LWP", "homeEngine is null");
+            else
+                Log.d("LWP", "homeEngine is NOT null");
+
+            if(isPreview())
+                Log.d("LWP", "is in preview!");
+            else
+                Log.d("LWP", "is NOT in preview!");
+
+
 			if (isPreview()) {
                 Log.d("LWP", "set preview engine");
 				setPreviewEngine(this);
@@ -377,9 +394,9 @@ public class LiveWallpaper extends AndroidLiveWallpaperService {
 
 			super.onSurfaceCreated(holder);
 
-			if (isPreview()){
+			/*if (isPreview()){
 				startSettingsActivity();
-			}
+			}*/
 		}
 
 
