@@ -24,7 +24,7 @@
 <resources>
 
     <!-- General terms -->
-    <string name="app_name">Pocket Code</string>
+    <string name="app_name">Pocket Code LiveWallpaper</string>
     <string name="cancel_button">Cancel</string>
     <string name="rename">Rename</string>
     <string name="delete">Delete</string>
@@ -704,15 +704,15 @@
 
     <!-- Brick Data Editor Strings -->
     <string name="brick_data_editor_title">Brick Editor</string>
- 	<string name="separator">|</string>
- 	<string name="add_text">Add Text</string>
- 	<string name="edit_text">Edit Text</string>
- 	<string name="text_hint">Brick Text</string>
- 	<string name="add_variable">Add Variable</string>
- 	<string name="add_line_break">Add Line Break</string>
- 	<string name="edit_variable">Edit Variable</string>
- 	<string name="variable_hint">Variable Name</string>
-    <!-- -->
+    <string name="separator">|</string>
+    <string name="add_text">Add Text</string>
+    <string name="edit_text">Edit Text</string>
+    <string name="text_hint">Brick Text</string>
+    <string name="add_variable">Add Variable</string>
+    <string name="add_line_break">Add Line Break</string>
+    <string name="edit_variable">Edit Variable</string>
+    <string name="variable_hint">Variable Name</string>
+ 	<!-- -->
 
     <!-- User Bricks strings -->
     <string name="define">define</string>
@@ -721,7 +721,45 @@
     <string name="recursive_user_brick_forbidden">Adding UserBrick to UserBrick is not allowed yet!</string>
  	<string name="brick_single">Brick</string>
  	<string name="brick_multiple">Bricks</string>
+ 	
+ 	<!-- -->    
 
-    <!-- -->
+
+    <!-- LiveWallpaper -->
+    <string name="lwp_delete">Delete</string>
+    <string name="lwp_effect1">Effect 1</string>
+    <string name="lwp_effect2">Effect 2</string>
+    <string name="lwp_disable_effect">Disable effects</string>
+    <string name="lwp_select_effects">Select effects</string>
+    <string name="lwp_postprocessing_disabled_color">Orange</string>
+    <string name="lwp_postprocessing_enabled_color">Green</string>
+    <string name="lwp_pocket_code">Pocket Code</string>
+    <string name="lwp_tinting">Tinting</string>
+    <string name="lwp_about">About</string>
+    <string name="lwp_enable_sound">Enable sounds</string>
+    <string name="lwp_disable_tinting">Disable tinting</string>
+    <string name="lwp_color_dialog_title">Pick a color</string>
+    <string name="lwp_sepia">Sepia</string>
+    <string name="live_wallpaper_active_notification_title_template">Live wallpaper active: %1$s</string>
+    <string name="live_wallpaper_active_notification_placeholder_text_template">You said %1$s and lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam non enim magna. Morbi dictum, velit vel semper venenatis, magna odio volutpat velit, at ullamcorper nulla lacus sed turpis. Pellentesque vitae metus elit, nec tincidunt tellus. Integer sed nisl sem, ullamcorper ornare lacus. Duis ac mauris sed massa congue volutpat. Donec sed erat sit amet turpis viverra rhoncus sit amet nec magna. Donec lacinia ligula at libero volutpat volutpat nec nec tortor.</string>
+    <string name="action_share">Share</string>
+    <string name="action_reply">Reply</string>
+    <string name="about_this_wallpaper">About this wallpaper</string>
+    <string name="action_doubleTapped"></string>
+    <string name="create_programs">Create new wallpaper</string>
+    <string name="download_programs">Explore</string>
+    <string name="get_more_wallpapers">Get more wallpapers</string>
+    <string name="lwp_allow_sounds">Allow sounds</string>
+    <string name="lwp_app_name">Pocket Code Live Wallpaper</string>
+    <string name="lwp_confirm_set_program_message">Set this program?</string>
+    <string name="lwp_error_delete_current_program">You cannot delete this program because it is currently in preview.</string>
+    <string name="lwp_error_delete_multiple_program">"One of the selected programs is in preview and cannot be deleted. Do you wish to delete the other selected programs?"</string>
+    <string name="lwp_general_information">General information</string>
+    <string name="lwp_no_landscape_support">Unfortuanetely, this livewallpaper does not support landscape screen orientation.</string>
+    <string name="lwp_preferences">Preferences</string>
+    <string name="lwp_project_description">Description:</string>
+    <string name="lwp_project_name">Name</string>
+    <string name="lwp_select_program">Select wallpaper</string>
+    <string name="pocket_code_not_installed">Pocket Code is not installed. Do you want to install it?</string>
 
 </resources>
