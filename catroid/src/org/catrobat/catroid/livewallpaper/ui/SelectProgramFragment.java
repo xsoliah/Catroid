@@ -67,6 +67,7 @@ import org.catrobat.catroid.utils.UtilFile;
 import org.catrobat.catroid.utils.Utils;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -341,6 +342,7 @@ public class SelectProgramFragment extends SherlockListFragment implements OnPro
 
 		boolean currentProgramSelected = false;
 		Project currentProject = projectManagerLWP.getCurrentProject();
+		Log.d("LWP|SelectProgramFrag", "checkIfCurrentProgramSelectedForDeletion(): currentProject = " + currentProject);
 		for (int position : adapter.getCheckedProjects()) {
 			ProjectData tempProjectData = (ProjectData) getListView().getItemAtPosition(position);
 			if (currentProject.getName().equalsIgnoreCase(tempProjectData.projectName)) {
@@ -442,6 +444,7 @@ public class SelectProgramFragment extends SherlockListFragment implements OnPro
 		try {
 			StorageHandler.getInstance().deleteProject(projectToEdit.projectName);
 		} catch (Exception e) {
+			Log.d("LWP|SelectProgramFrag", "Exception in deleteProject()!");
 			e.printStackTrace();
 		}
 		projectList.remove(projectToEdit);

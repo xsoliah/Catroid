@@ -165,15 +165,8 @@
             </intent-filter>
         </activity>
 
-        <activity
-                    android:name=".livewallpaper.ui.LWPSettingsActivity"
-                    android:exported="true"
-                    android:label="@string/app_name"
-                    android:theme="@android:style/Theme.Light.WallpaperSettings" >
-        </activity>
-
         <service android:name="org.catrobat.catroid.livewallpaper.ui.LiveWallpaperService"
-            android:label="Halllo"
+            android:label="@string/lwp_app_name"
             android:permission="android.permission.BIND_WALLPAPER"
             android:enabled="true">
         <intent-filter>
@@ -182,6 +175,15 @@
             <meta-data android:name="android.service.wallpaper"
                 android:resource="@xml/livewallpaper"/>
         </service>
+
+        <activity
+            android:name=".livewallpaper.ui.SelectProgramActivity"
+            android:exported="true"
+            android:noHistory="false"
+            android:parentActivityName=".livewallpaper.ui.SelectProgramActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan" >
+        </activity>
 
 
         <service android:name=".transfers.ProjectUploadService" />

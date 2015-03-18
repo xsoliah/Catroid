@@ -36,6 +36,7 @@ import android.graphics.Paint;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.service.wallpaper.WallpaperService;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 
@@ -44,6 +45,18 @@ import android.view.SurfaceHolder;
  * Created by marco on 17.03.15.
  */
 public class LiveWallpaperService extends AndroidLiveWallpaperService {
+
+	@Override
+	public void onCreate() {
+		Log.d("LWP|LiveWallpaperServ", "LiveWallpaperService.onCreate()!");
+		super.onCreate();
+	}
+
+	@Override
+	public void onDestroy() {
+		Log.d("LWP|LiveWallpaperServ", "LiveWallpaperService.onDestroy()!");
+		super.onDestroy();
+	}
 
 	@Override
 	public void offsetChange (ApplicationListener listener, float xOffset, float yOffset, float xOffsetStep, float yOffsetStep, int xPixelOffset, int yPixelOffset) {
@@ -121,9 +134,11 @@ public class LiveWallpaperService extends AndroidLiveWallpaperService {
 		public LiveWallpaperEngine() {
 			SharedPreferences prefs = PreferenceManager
 					.getDefaultSharedPreferences(LiveWallpaperService.this);
-			maxNumber = Integer
+			/*maxNumber = Integer
 					.valueOf(prefs.getString("numberOfCircles", "4"));
-			touchEnabled = prefs.getBoolean("touch", false);
+			touchEnabled = prefs.getBoolean("touch", false);*/
+			maxNumber = 10;
+			touchEnabled = false;
 			circles = new ArrayList<MyPoint>();
 			paint.setAntiAlias(true);
 			paint.setColor(Color.WHITE);
@@ -167,7 +182,7 @@ public class LiveWallpaperService extends AndroidLiveWallpaperService {
 				SurfaceHolder holder = getSurfaceHolder();
 				Canvas canvas = null;
 				try {
-					canvas = holder.lockCanvas();
+					//canvas = holder.lockCanvas();
 					if (canvas != null) {
 						canvas.drawColor(Color.BLACK);
 						circles.clear();
@@ -176,8 +191,8 @@ public class LiveWallpaperService extends AndroidLiveWallpaperService {
 
 					}
 				} finally {
-					if (canvas != null)
-						holder.unlockCanvasAndPost(canvas);
+					if (canvas != null) {}
+						//holder.unlockCanvasAndPost(canvas);
 				}
 				super.onTouchEvent(event);
 			}
@@ -199,7 +214,7 @@ public class LiveWallpaperService extends AndroidLiveWallpaperService {
 					drawCircles(canvas, circles);
 				}
 			} finally {
-				if (canvas != null)
+				if (canvas != null) {}
 					holder.unlockCanvasAndPost(canvas);
 			}
 			handler.removeCallbacks(drawRunner);
