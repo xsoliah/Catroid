@@ -34,13 +34,12 @@ import org.catrobat.catroid.content.StartScript;
 import org.catrobat.catroid.content.bricks.Brick;
 import org.catrobat.catroid.content.bricks.PlaceAtBrick;
 import org.catrobat.catroid.content.bricks.PointToBrick;
-import org.catrobat.catroid.content.bricks.PointToBrick.SpinnerAdapterWrapper;
+import org.catrobat.catroid.test.utils.Reflection;
 import org.catrobat.catroid.ui.ScriptActivity;
 import org.catrobat.catroid.ui.adapter.BrickAdapter;
 import org.catrobat.catroid.ui.dialogs.NewSpriteDialog;
 import org.catrobat.catroid.ui.dialogs.NewSpriteDialog.ActionAfterFinished;
 import org.catrobat.catroid.uitest.util.BaseActivityInstrumentationTestCase;
-import org.catrobat.catroid.uitest.util.Reflection;
 import org.catrobat.catroid.uitest.util.UiTestUtils;
 
 import java.io.File;
@@ -187,7 +186,8 @@ public class PointToBrickTest extends BaseActivityInstrumentationTestCase<Script
 	}
 
 	private void createNewObjectWithinBrick(String objectName, int stringToClickOnAtTheEnd) {
-		SpinnerAdapterWrapper spinner = (SpinnerAdapterWrapper) Reflection.getPrivateField(pointToBrick,
+		//TODO Field is not present in pointToBrick
+		NewSpriteDialog.SpinnerAdapterWrapper spinner = (NewSpriteDialog.SpinnerAdapterWrapper) Reflection.getPrivateField(pointToBrick,
 				"spinnerAdapterWrapper");
 
 		UiTestUtils.showAndFilloutNewSpriteDialogWithoutClickingOk(solo, objectName, lookFile,

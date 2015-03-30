@@ -61,6 +61,7 @@ import org.catrobat.catroid.formulaeditor.InternFormulaKeyboardAdapter;
 import org.catrobat.catroid.formulaeditor.InternFormulaParser;
 import org.catrobat.catroid.ui.BottomBar;
 import org.catrobat.catroid.ui.ScriptActivity;
+import org.catrobat.catroid.ui.bricks.BrickViewProvider;
 import org.catrobat.catroid.ui.dialogs.CustomAlertDialogBuilder;
 import org.catrobat.catroid.ui.dialogs.FormulaEditorComputeDialog;
 import org.catrobat.catroid.ui.dialogs.NewStringDialog;
@@ -89,7 +90,7 @@ public class FormulaEditorFragment extends SherlockFragment implements OnKeyList
 	private ImageButton formularEditorFieldDeleteButton;
 	private LinearLayout formulaEditorBrick;
 	private View brickView;
-	private long[] confirmSwitchEditTextTimeStamp = { 0, 0 };
+	private long[] confirmSwitchEditTextTimeStamp = {0, 0};
 	private int confirmSwitchEditTextCounter = 0;
 	private CharSequence previousActionBarTitle;
 	private View fragmentView;
@@ -155,7 +156,8 @@ public class FormulaEditorFragment extends SherlockFragment implements OnKeyList
 	private void updateBrickView(Brick newBrick) {
 		currentBrick = newBrick;
 		formulaEditorBrick.removeAllViews();
-		View newBrickView = newBrick.getView(context, 0, null);
+		BrickViewProvider brickViewProvider = new BrickViewProvider(context);
+		View newBrickView = brickViewProvider.createView(newBrick, null);
 		formulaEditorBrick.addView(newBrickView, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
 				LinearLayout.LayoutParams.MATCH_PARENT));
 		brickView = newBrickView;
@@ -199,7 +201,8 @@ public class FormulaEditorFragment extends SherlockFragment implements OnKeyList
 		formularEditorFieldDeleteButton = (ImageButton) fragmentView.findViewById(R.id.formula_editor_edit_field_clear);
 
 		context = getActivity();
-		brickView = currentBrick.getView(context, 0, null);
+		BrickViewProvider brickViewProvider = new BrickViewProvider(context);
+		brickView = brickViewProvider.createView(currentBrick, null);
 
 		formulaEditorBrick = (LinearLayout) fragmentView.findViewById(R.id.formula_editor_brick_space);
 
@@ -461,13 +464,13 @@ public class FormulaEditorFragment extends SherlockFragment implements OnKeyList
 								}
 							}).setPositiveButton(R.string.yes, new OnClickListener() {
 
-								@Override
-								public void onClick(DialogInterface dialog, int which) {
-									if (saveFormulaIfPossible()) {
-										onUserDismiss();
-									}
-								}
-							}).create().show();
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							if (saveFormulaIfPossible()) {
+								onUserDismiss();
+							}
+						}
+					}).create().show();
 
 				} else {
 					onUserDismiss();

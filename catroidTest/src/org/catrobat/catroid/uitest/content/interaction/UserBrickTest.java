@@ -49,7 +49,9 @@ public class UserBrickTest extends BaseActivityInstrumentationTestCase<MainMenuA
 	{
 		UiTestUtils.showSourceAndEditBrick(UiTestUtils.TEST_USER_BRICK_NAME, solo);
 		UiTestUtils.openActionMode(solo, solo.getString(R.string.copy), R.id.copy, solo.getCurrentActivity());
-		solo.clickOnCheckBox(0);
+
+		UiTestUtils.clickOnBrickView(solo, 0);
+
 		UiTestUtils.acceptAndCloseActionMode(solo);
 		solo.sleep(300);
 		assertEquals("The selected brick could not be copied!", 2, ProjectManager.getInstance().getCurrentUserBrick().getDefinitionBrick().getUserScript().getBrickList().size());

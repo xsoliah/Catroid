@@ -315,7 +315,7 @@ public class ScriptActivity extends BaseActivity {
 		String tag1 = UserBrickDataEditorFragment.BRICK_DATA_EDITOR_FRAGMENT_TAG;
 		UserBrickDataEditorFragment fragment = (UserBrickDataEditorFragment) fragmentManager.findFragmentByTag(tag1);
 		if (fragment != null && fragment.isVisible()) {
-				return fragment.onKey(null, keyCode, event);
+			return fragment.onKey(null, keyCode, event);
 		}
 
 		FormulaEditorDataFragment formulaEditorDataFragment = (FormulaEditorDataFragment) getSupportFragmentManager()
@@ -427,13 +427,13 @@ public class ScriptActivity extends BaseActivity {
 
 		if (currentFragment != null && currentFragment.getActionModeActive()
 				&& event.getKeyCode() == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP) {
-			ListAdapter adapter = null;
-			if (currentFragment instanceof ScriptFragment) {
-				adapter = ((ScriptFragment) currentFragment).getAdapter();
-			} else {
-				adapter = currentFragment.getListAdapter();
+
+			if (!(currentFragment instanceof ScriptFragment)) {
+				((ScriptActivityAdapterInterface) currentFragment.getListAdapter()).clearCheckedItems();
+			}else{
+				//ScriptFragment manages clear items itself.
+				((ScriptFragment)currentFragment).beforeCancelActionMode();
 			}
-			((ScriptActivityAdapterInterface) adapter).clearCheckedItems();
 		}
 
 		return super.dispatchKeyEvent(event);

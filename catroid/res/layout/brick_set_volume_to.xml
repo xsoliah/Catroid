@@ -22,19 +22,14 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:app="http://schemas.android.com/apk/res-auto"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:gravity="center_vertical"
-              android:orientation="horizontal" >
+<org.catrobat.catroid.ui.BrickView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="horizontal">
 
-    <CheckBox
-        android:id="@+id/brick_set_volume_to_checkbox"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:visibility="gone" />
+    <include layout="@layout/include_brick_checkbox" />
 
     <org.catrobat.catroid.ui.BrickLayout
         android:id="@+id/brick_set_volume_to_layout"
@@ -43,32 +38,27 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:horizontalSpacing="@dimen/brick_flow_layout_horizontal_spacing"
-        app:verticalSpacing="@dimen/brick_flow_layout_vertical_spacing" >
+        app:verticalSpacing="@dimen/brick_flow_layout_vertical_spacing">
 
         <TextView
-            android:id="@+id/brick_set_volume_to_text_view"
+            android:id="@+id/brick_set_volume_to_label"
             style="@style/BrickText.SingleLine"
-            android:text="@string/brick_set_volume_to" >
-        </TextView >
-
-        <TextView
-            android:id="@+id/brick_set_volume_to_prototype_text_view"
-            style="@style/BrickPrototypeTextView" >
-        </TextView >
+            android:text="@string/brick_set_volume_to">
+        </TextView>
 
         <TextView
             android:id="@+id/brick_set_volume_to_edit_text"
             style="@style/BrickEditText"
+            android:ems="5"
             app:layout_inputType="number"
-            app:layout_textField="true"
-            android:ems="5" >
-        </TextView >
+            app:layout_textField="true">
+        </TextView>
 
         <TextView
             android:id="@+id/brick_set_volume_to_percent"
             style="@style/BrickText.SingleLine"
-            android:text="@string/percent_symbol" >
-        </TextView >
-    </org.catrobat.catroid.ui.BrickLayout >
+            android:text="@string/percent_symbol">
+        </TextView>
+    </org.catrobat.catroid.ui.BrickLayout>
 
-</LinearLayout>
+</org.catrobat.catroid.ui.BrickView>

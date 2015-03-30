@@ -23,18 +23,13 @@
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:app="http://schemas.android.com/apk/res-auto"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:gravity="center_vertical"
-              android:orientation="horizontal" >
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="horizontal">
 
-    <CheckBox
-        android:id="@+id/brick_vibration_checkbox"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:visibility="gone" />
+    <include layout="@layout/include_brick_checkbox" />
 
     <org.catrobat.catroid.ui.BrickLayout
         android:id="@+id/brick_vibration_layout"
@@ -43,30 +38,24 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:horizontalSpacing="@dimen/brick_flow_layout_horizontal_spacing"
-        app:verticalSpacing="@dimen/brick_flow_layout_vertical_spacing" >
+        app:verticalSpacing="@dimen/brick_flow_layout_vertical_spacing">
 
         <TextView
             android:id="@+id/brick_vibration_label"
             style="@style/BrickText.SingleLine"
-            android:text="@string/brick_vibration" >
-        </TextView>
-
-        <TextView
-            android:id="@+id/brick_vibration_prototype_text_view_seconds"
-            style="@style/BrickPrototypeTextView"
-            android:layout_width="match_parent" >
+            android:text="@string/brick_vibration">
         </TextView>
 
         <TextView
             android:id="@+id/brick_vibration_edit_seconds_text"
             style="@style/BrickEditText"
             app:layout_inputType="number"
-            app:layout_textField="true" >
+            app:layout_textField="true">
         </TextView>
 
         <TextView
             android:id="@+id/brick_vibration_second_text_view"
-            style="@style/BrickText.Multiple" >
+            style="@style/BrickText.Multiple">
         </TextView>
     </org.catrobat.catroid.ui.BrickLayout>
 

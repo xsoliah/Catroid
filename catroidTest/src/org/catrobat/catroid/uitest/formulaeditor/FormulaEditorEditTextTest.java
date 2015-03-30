@@ -47,12 +47,12 @@ import org.catrobat.catroid.formulaeditor.InternToken;
 import org.catrobat.catroid.formulaeditor.InternTokenType;
 import org.catrobat.catroid.formulaeditor.SensorHandler;
 import org.catrobat.catroid.formulaeditor.SensorLoudness;
+import org.catrobat.catroid.test.utils.Reflection;
+import org.catrobat.catroid.test.utils.SimulatedSensorManager;
+import org.catrobat.catroid.test.utils.SimulatedSoundRecorder;
 import org.catrobat.catroid.ui.MainMenuActivity;
 import org.catrobat.catroid.uitest.annotation.Device;
 import org.catrobat.catroid.uitest.util.BaseActivityInstrumentationTestCase;
-import org.catrobat.catroid.uitest.util.Reflection;
-import org.catrobat.catroid.uitest.util.SimulatedSensorManager;
-import org.catrobat.catroid.uitest.util.SimulatedSoundRecorder;
 import org.catrobat.catroid.uitest.util.UiTestUtils;
 
 import java.util.LinkedList;
@@ -664,8 +664,8 @@ public class FormulaEditorEditTextTest extends BaseActivityInstrumentationTestCa
 		solo.clickOnText(getActivity().getString(R.string.formula_editor_object_y));
 
 		solo.clickOnView(solo.getView(R.id.formula_editor_keyboard_object));
-		solo.waitForText(getActivity().getString(R.string.formula_editor_object_ghosteffect));
-		solo.clickOnText(getActivity().getString(R.string.formula_editor_object_ghosteffect));
+		solo.waitForText(getActivity().getString(R.string.formula_editor_object_transparency));
+		solo.clickOnText(getActivity().getString(R.string.formula_editor_object_transparency));
 
 		solo.clickOnView(solo.getView(R.id.formula_editor_keyboard_object));
 		solo.waitForText(getActivity().getString(R.string.formula_editor_object_brightness));

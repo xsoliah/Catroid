@@ -22,8 +22,6 @@
  */
 package org.catrobat.catroid.content.bricks;
 
-import android.widget.TextView;
-
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 
 import org.catrobat.catroid.ProjectManager;
@@ -37,8 +35,6 @@ public class UserBrickParameter extends FormulaBrick {
 
 	public int parameterIndex;
 	public String variableName;
-	public transient TextView textView;
-	public transient TextView prototypeView;
 
 	public UserBrickParameter() {
 		addAllowedBrickField(BrickField.USER_BRICK);

@@ -53,11 +53,6 @@ public class DroneTurnRightMagnetoBrick extends DroneMoveBrick {
 	}
 
 	@Override
-	protected String getBrickLabel(View view) {
-		return view.getResources().getString(R.string.brick_drone_turn_right_magneto);
-	}
-
-	@Override
 	public List<SequenceAction> addActionToSequence(Sprite sprite, SequenceAction sequence) {
 		sequence.addAction(ExtendedActions.droneTurnRightMagneto(sprite,
 				getFormulaWithBrickField(BrickField.DRONE_TIME_TO_FLY_IN_SECONDS),
@@ -73,11 +68,4 @@ public class DroneTurnRightMagnetoBrick extends DroneMoveBrick {
 		return brickView;
 	}
 
-	@Override
-	public View getPrototypeView(Context context) {
-		prototypeView = super.getPrototypeView(context);
-		TextView textView = (TextView) prototypeView.findViewById(R.id.brick_drone_move_text_view_power);
-		textView.setText(R.string.brick_drone_angle);
-		return prototypeView;
-	}
 }
