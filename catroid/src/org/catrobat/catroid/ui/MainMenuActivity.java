@@ -125,6 +125,7 @@ public class MainMenuActivity extends BaseActivity implements OnLoadProjectCompl
 	@Override
 	public void onPause() {
 		super.onPause();
+
 		if (!Utils.externalStorageAvailable()) {
 			return;
 		}
