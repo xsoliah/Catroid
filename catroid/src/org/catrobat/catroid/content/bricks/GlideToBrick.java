@@ -1,6 +1,6 @@
 /*
  * Catroid: An on-device visual programming system for Android devices
- * Copyright (C) 2010-2014 The Catrobat Team
+ * Copyright (C) 2010-2015 The Catrobat Team
  * (<http://developer.catrobat.org/credits>)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -26,7 +26,6 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.BaseAdapter;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
@@ -48,7 +47,7 @@ import org.catrobat.catroid.utils.Utils;
 
 import java.util.List;
 
-public class GlideToBrick extends FormulaBrick implements OnClickListener {
+public class GlideToBrick extends FormulaBrick {
 	private static final long serialVersionUID = 1L;
 
 	private transient View prototypeView;
@@ -213,21 +212,20 @@ public class GlideToBrick extends FormulaBrick implements OnClickListener {
 		if (checkbox.getVisibility() == View.VISIBLE) {
 			return;
 		}
+
 		switch (view.getId()) {
 			case R.id.brick_glide_to_edit_text_x:
-				FormulaEditorFragment.showFragment(view, this, getFormulaWithBrickField(BrickField.X_DESTINATION));
+				FormulaEditorFragment.showFragment(view, this, BrickField.X_DESTINATION);
 				break;
 
 			case R.id.brick_glide_to_edit_text_y:
-				FormulaEditorFragment.showFragment(view, this, getFormulaWithBrickField(BrickField.Y_DESTINATION));
+				FormulaEditorFragment.showFragment(view, this, BrickField.Y_DESTINATION);
 				break;
 
 			case R.id.brick_glide_to_edit_text_duration:
-				FormulaEditorFragment
-						.showFragment(view, this, getFormulaWithBrickField(BrickField.DURATION_IN_SECONDS));
+				FormulaEditorFragment.showFragment(view, this, BrickField.DURATION_IN_SECONDS);
 				break;
 		}
-
 	}
 
 	@Override
@@ -236,5 +234,9 @@ public class GlideToBrick extends FormulaBrick implements OnClickListener {
 				getFormulaWithBrickField(BrickField.Y_DESTINATION),
 				getFormulaWithBrickField(BrickField.DURATION_IN_SECONDS)));
 		return null;
+	}
+
+	public void showFormulaEditorToEditFormula(View view) {
+		FormulaEditorFragment.showFragment(view, this, BrickField.X_DESTINATION);
 	}
 }

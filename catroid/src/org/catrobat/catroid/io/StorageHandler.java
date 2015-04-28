@@ -1,6 +1,6 @@
 /*
  * Catroid: An on-device visual programming system for Android devices
- * Copyright (C) 2010-2014 The Catrobat Team
+ * Copyright (C) 2010-2015 The Catrobat Team
  * (<http://developer.catrobat.org/credits>)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -43,19 +43,22 @@ import org.catrobat.catroid.content.Sprite;
 import org.catrobat.catroid.content.StartScript;
 import org.catrobat.catroid.content.WhenScript;
 import org.catrobat.catroid.content.XmlHeader;
+import org.catrobat.catroid.content.bricks.AddItemToUserListBrick;
+import org.catrobat.catroid.content.bricks.Brick;
 import org.catrobat.catroid.content.bricks.BrickBaseType;
 import org.catrobat.catroid.content.bricks.BroadcastBrick;
 import org.catrobat.catroid.content.bricks.BroadcastReceiverBrick;
 import org.catrobat.catroid.content.bricks.BroadcastWaitBrick;
 import org.catrobat.catroid.content.bricks.ChangeBrightnessByNBrick;
-import org.catrobat.catroid.content.bricks.ChangeGhostEffectByNBrick;
 import org.catrobat.catroid.content.bricks.ChangeSizeByNBrick;
+import org.catrobat.catroid.content.bricks.ChangeTransparencyByNBrick;
 import org.catrobat.catroid.content.bricks.ChangeVariableBrick;
 import org.catrobat.catroid.content.bricks.ChangeVolumeByNBrick;
 import org.catrobat.catroid.content.bricks.ChangeXByNBrick;
 import org.catrobat.catroid.content.bricks.ChangeYByNBrick;
 import org.catrobat.catroid.content.bricks.ClearGraphicEffectBrick;
 import org.catrobat.catroid.content.bricks.ComeToFrontBrick;
+import org.catrobat.catroid.content.bricks.DeleteItemOfUserListBrick;
 import org.catrobat.catroid.content.bricks.DroneFlipBrick;
 import org.catrobat.catroid.content.bricks.DroneLandBrick;
 import org.catrobat.catroid.content.bricks.DroneMoveBackwardBrick;
@@ -75,6 +78,7 @@ import org.catrobat.catroid.content.bricks.IfLogicBeginBrick;
 import org.catrobat.catroid.content.bricks.IfLogicElseBrick;
 import org.catrobat.catroid.content.bricks.IfLogicEndBrick;
 import org.catrobat.catroid.content.bricks.IfOnEdgeBounceBrick;
+import org.catrobat.catroid.content.bricks.InsertItemIntoUserListBrick;
 import org.catrobat.catroid.content.bricks.LedOffBrick;
 import org.catrobat.catroid.content.bricks.LedOnBrick;
 import org.catrobat.catroid.content.bricks.LegoNxtMotorActionBrick;
@@ -92,10 +96,11 @@ import org.catrobat.catroid.content.bricks.PlaySoundBrick;
 import org.catrobat.catroid.content.bricks.PointInDirectionBrick;
 import org.catrobat.catroid.content.bricks.PointToBrick;
 import org.catrobat.catroid.content.bricks.RepeatBrick;
+import org.catrobat.catroid.content.bricks.ReplaceItemInUserListBrick;
 import org.catrobat.catroid.content.bricks.SetBrightnessBrick;
-import org.catrobat.catroid.content.bricks.SetGhostEffectBrick;
 import org.catrobat.catroid.content.bricks.SetLookBrick;
 import org.catrobat.catroid.content.bricks.SetSizeToBrick;
+import org.catrobat.catroid.content.bricks.SetTransparencyBrick;
 import org.catrobat.catroid.content.bricks.SetVariableBrick;
 import org.catrobat.catroid.content.bricks.SetVolumeToBrick;
 import org.catrobat.catroid.content.bricks.SetXBrick;
@@ -114,8 +119,9 @@ import org.catrobat.catroid.content.bricks.VibrationBrick;
 import org.catrobat.catroid.content.bricks.WaitBrick;
 import org.catrobat.catroid.content.bricks.WhenBrick;
 import org.catrobat.catroid.content.bricks.WhenStartedBrick;
+import org.catrobat.catroid.formulaeditor.DataContainer;
+import org.catrobat.catroid.formulaeditor.UserList;
 import org.catrobat.catroid.formulaeditor.UserVariable;
-import org.catrobat.catroid.formulaeditor.UserVariablesContainer;
 import org.catrobat.catroid.utils.ImageEditing;
 import org.catrobat.catroid.utils.UtilFile;
 import org.catrobat.catroid.utils.Utils;
@@ -127,8 +133,10 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -140,6 +148,7 @@ import static org.catrobat.catroid.common.Constants.IMAGE_DIRECTORY;
 import static org.catrobat.catroid.common.Constants.NO_MEDIA_FILE;
 import static org.catrobat.catroid.common.Constants.PROJECTCODE_NAME;
 import static org.catrobat.catroid.common.Constants.PROJECTCODE_NAME_TMP;
+import static org.catrobat.catroid.common.Constants.PROJECTPERMISSIONS_NAME;
 import static org.catrobat.catroid.common.Constants.SOUND_DIRECTORY;
 import static org.catrobat.catroid.utils.Utils.buildPath;
 import static org.catrobat.catroid.utils.Utils.buildProjectPath;
@@ -150,7 +159,7 @@ public final class StorageHandler {
 	private static final String XML_HEADER = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\" ?>\n";
 	private static final int JPG_COMPRESSION_SETTING = 95;
 
-	private XStreamToSupportCatrobatLanguageVersion092AndBefore xstream;
+	private XStreamToSupportCatrobatLanguageVersion095AndBefore xstream;
 
 	private File backPackSoundDirectory;
 	private FileInputStream fileInputStream;
@@ -168,14 +177,15 @@ public final class StorageHandler {
 	}
 
 	private StorageHandler() throws IOException {
-		xstream = new XStreamToSupportCatrobatLanguageVersion092AndBefore(new PureJavaReflectionProvider(new FieldDictionary(new CatroidFieldKeySorter())));
+		xstream = new XStreamToSupportCatrobatLanguageVersion095AndBefore(new PureJavaReflectionProvider(new FieldDictionary(new CatroidFieldKeySorter())));
 		xstream.processAnnotations(Project.class);
 		xstream.processAnnotations(XmlHeader.class);
-		xstream.processAnnotations(UserVariablesContainer.class);
+		xstream.processAnnotations(DataContainer.class);
 		xstream.registerConverter(new XStreamConcurrentFormulaHashMapConverter());
 		xstream.registerConverter(new XStreamUserVariableConverter());
 		xstream.registerConverter(new XStreamBrickConverter(xstream.getMapper(), xstream.getReflectionProvider()));
 		xstream.registerConverter(new XStreamScriptConverter(xstream.getMapper(), xstream.getReflectionProvider()));
+
 		setXstreamAliases();
 
 		if (!Utils.externalStorageAvailable()) {
@@ -213,6 +223,7 @@ public final class StorageHandler {
 		xstream.alias("look", LookData.class);
 		xstream.alias("sound", SoundInfo.class);
 		xstream.alias("userVariable", UserVariable.class);
+		xstream.alias("userList", UserList.class);
 
 		xstream.alias("script", Script.class);
 		xstream.alias("object", Sprite.class);
@@ -221,11 +232,12 @@ public final class StorageHandler {
 		xstream.alias("script", WhenScript.class);
 		xstream.alias("script", BroadcastScript.class);
 
+		xstream.alias("brick", AddItemToUserListBrick.class);
 		xstream.alias("brick", BroadcastBrick.class);
 		xstream.alias("brick", BroadcastReceiverBrick.class);
 		xstream.alias("brick", BroadcastWaitBrick.class);
 		xstream.alias("brick", ChangeBrightnessByNBrick.class);
-		xstream.alias("brick", ChangeGhostEffectByNBrick.class);
+		xstream.alias("brick", ChangeTransparencyByNBrick.class);
 		xstream.alias("brick", ChangeSizeByNBrick.class);
 		xstream.alias("brick", ChangeVariableBrick.class);
 		xstream.alias("brick", ChangeVolumeByNBrick.class);
@@ -233,6 +245,7 @@ public final class StorageHandler {
 		xstream.alias("brick", ChangeYByNBrick.class);
 		xstream.alias("brick", ClearGraphicEffectBrick.class);
 		xstream.alias("brick", ComeToFrontBrick.class);
+		xstream.alias("brick", DeleteItemOfUserListBrick.class);
 		xstream.alias("brick", ForeverBrick.class);
 		xstream.alias("brick", GlideToBrick.class);
 		xstream.alias("brick", GoNStepsBackBrick.class);
@@ -241,6 +254,7 @@ public final class StorageHandler {
 		xstream.alias("brick", IfLogicElseBrick.class);
 		xstream.alias("brick", IfLogicEndBrick.class);
 		xstream.alias("brick", IfOnEdgeBounceBrick.class);
+		xstream.alias("brick", InsertItemIntoUserListBrick.class);
 		xstream.alias("brick", LedOffBrick.class);
 		xstream.alias("brick", LedOnBrick.class);
 		xstream.alias("brick", LegoNxtMotorActionBrick.class);
@@ -258,8 +272,9 @@ public final class StorageHandler {
 		xstream.alias("brick", PointInDirectionBrick.class);
 		xstream.alias("brick", PointToBrick.class);
 		xstream.alias("brick", RepeatBrick.class);
+		xstream.alias("brick", ReplaceItemInUserListBrick.class);
 		xstream.alias("brick", SetBrightnessBrick.class);
-		xstream.alias("brick", SetGhostEffectBrick.class);
+		xstream.alias("brick", SetTransparencyBrick.class);
 		xstream.alias("brick", SetLookBrick.class);
 		xstream.alias("brick", SetSizeToBrick.class);
 		xstream.alias("brick", SetVariableBrick.class);
@@ -393,6 +408,16 @@ public final class StorageHandler {
 			writer = new BufferedWriter(new FileWriter(tmpCodeFile), Constants.BUFFER_8K);
 			writer.write(projectXml);
 			writer.flush();
+
+			File permissionFile = new File(buildProjectPath(project.getName()), PROJECTPERMISSIONS_NAME);
+			writer = new BufferedWriter(new FileWriter(permissionFile), Constants.BUFFER_8K);
+
+			for (String resource : generatePermissionsSetFromResource(project.getRequiredResources())) {
+				writer.write(resource);
+				writer.newLine();
+			}
+			writer.flush();
+
 			return true;
 		} catch (Exception exception) {
 			Log.e(TAG, "Saving project " + project.getName() + " failed.", exception);
@@ -730,4 +755,27 @@ public final class StorageHandler {
 		fileChecksumContainer.addChecksum(checksumSource, destinationFile.getAbsolutePath());
 	}
 
+	private Set<String> generatePermissionsSetFromResource(int resources) {
+		Set<String> permissionsSet = new HashSet<String>();
+
+		if ((resources & Brick.TEXT_TO_SPEECH) > 0) {
+			permissionsSet.add(Constants.TEXT_TO_SPEECH);
+		}
+		if ((resources & Brick.BLUETOOTH_LEGO_NXT) > 0) {
+			permissionsSet.add(Constants.BLUETOOTH_LEGO_NXT);
+		}
+		if ((resources & Brick.ARDRONE_SUPPORT) > 0) {
+			permissionsSet.add(Constants.ARDRONE_SUPPORT);
+		}
+		if ((resources & Brick.CAMERA_LED) > 0) {
+			permissionsSet.add(Constants.CAMERA_LED);
+		}
+		if ((resources & Brick.VIBRATOR) > 0) {
+			permissionsSet.add(Constants.VIBRATOR);
+		}
+		if ((resources & Brick.FACE_DETECTION) > 0) {
+			permissionsSet.add(Constants.FACE_DETECTION);
+		}
+		return permissionsSet;
+	}
 }

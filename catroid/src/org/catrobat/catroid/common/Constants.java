@@ -1,6 +1,6 @@
 /*
  * Catroid: An on-device visual programming system for Android devices
- * Copyright (C) 2010-2014 The Catrobat Team
+ * Copyright (C) 2010-2015 The Catrobat Team
  * (<http://developer.catrobat.org/credits>)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -28,12 +28,14 @@ public final class Constants {
 
 	// Reflection in testcases needed
 	// http://stackoverflow.com/questions/1615163/modifying-final-fields-in-java?answertab=votes#tab-top
-	public static final float CURRENT_CATROBAT_LANGUAGE_VERSION = Float.valueOf(0.92f);
+
+	public static final float CURRENT_CATROBAT_LANGUAGE_VERSION = Float.valueOf(0.94f);
 
 	public static final String PLATFORM_NAME = "Android";
 	public static final int APPLICATION_BUILD_NUMBER = 0; // updated from jenkins nightly/release build
 	public static final String APPLICATION_BUILD_NAME = ""; // updated from jenkins nightly/release build
 	public static final String PROJECTCODE_NAME = "code.xml";
+	public static final String PROJECTPERMISSIONS_NAME = "permissions.txt";
 	public static final String PROJECTCODE_NAME_TMP = "tmp_" + PROJECTCODE_NAME;
 
 	public static final String CATROBAT_EXTENSION = ".catrobat";
@@ -54,6 +56,13 @@ public final class Constants {
 	public static final String FILENAME_SEPARATOR = "_";
 
 	public static final String NO_MEDIA_FILE = ".nomedia";
+
+	public static final String TEXT_TO_SPEECH = "TEXT_TO_SPEECH";
+	public static final String BLUETOOTH_LEGO_NXT = "BLUETOOTH_LEGO_NXT";
+	public static final String ARDRONE_SUPPORT = "ARDRONE_SUPPORT";
+	public static final String CAMERA_LED = "CAMERA_LED";
+	public static final String VIBRATOR = "VIBRATOR";
+	public static final String FACE_DETECTION = "FACE_DETECTION";
 
 	public static final int NO_POSITION = -1;
 
