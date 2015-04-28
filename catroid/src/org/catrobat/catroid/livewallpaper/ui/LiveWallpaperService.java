@@ -39,6 +39,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 
+import org.catrobat.catroid.ProjectManager;
 import org.catrobat.catroid.stage.StageListener;
 
 
@@ -50,22 +51,21 @@ public class LiveWallpaperService extends AndroidLiveWallpaperService {
 	private ApplicationListener stageListener = null;
 
 	@Override
-	public void onCreate() {
-		Log.d("LWP|LiveWallpaperServ", "LiveWallpaperService.onCreate()!");
-		super.onCreate();
-	}
-
-	@Override
-	public void onDestroy() {
-		Log.d("LWP|LiveWallpaperServ", "LiveWallpaperService.onDestroy()!");
-		super.onDestroy();
-	}
-
-	@Override
 	public void onCreateApplication() {
-		stageListener = new StageListener();
+		//stageListener = new StageListener();
+		stageListener = new SelectProjectNotificationListener();
 		AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
+		//ProjectManager.getInstance().initializeDefaultProject(this.getBaseContext());
 		this.initialize(stageListener, config);
+		Log.d("LWP|LWPService", "LWP onCreateApplication() called");
+	}
+
+	public void stopWallpaper() {
+
+	}
+
+	public void startWallpaper() {
+
 	}
 
 }
