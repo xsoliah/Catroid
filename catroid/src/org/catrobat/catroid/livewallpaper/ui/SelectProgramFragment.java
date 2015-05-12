@@ -269,6 +269,8 @@ public class SelectProgramFragment extends SherlockListFragment implements OnPro
 				LoadWallpaperTask loader = new LoadWallpaperTask(getActivity(),selectedProject, selectProgramFragment);
 				//loader.execute();
 				loader.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);*/
+				LoadWallpaperTask loader = new LoadWallpaperTask(getActivity(), selectedProject, selectProgramFragment);
+				loader.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
 				Log.d("LWP|SelectProgramFrag", "User wants to load Project: " + selectedProject + " !");
 			}
 		});

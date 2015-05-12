@@ -100,6 +100,55 @@ public final class ProjectManager implements OnLoadProjectCompleteListener, OnCh
 		}
 	}
 
+	public Project loadWallpaperProject(String projectName, Context context) throws LoadingProjectException,
+			OutdatedVersionProjectException, CompatibilityProjectException {
+		Project proj;
+		fileChecksumContainer = new FileChecksumContainer();
+		proj = StorageHandler.getInstance().loadProject(projectName);
+
+		if(proj == null) {
+			throw new LoadingProjectException(context.getString(R.string.error_load_project));
+		} else if (proj.getCatrobatLanguageVersion() > Constants.CURRENT_CATROBAT_LANGUAGE_VERSION) {
+			if (proj.getCatrobatLanguageVersion() == 0.93f) {
+				// this was done because of insufficient error message in older program versions
+				proj.setCatrobatLanguageVersion(0.92f);
+			} else {
+				throw new OutdatedVersionProjectException(context.getString(R.string.error_outdated_pocketcode_version));
+			}
+
+		}  else {
+			if (proj.getCatrobatLanguageVersion() == 0.8f) {
+				//TODO insert in every "When project starts" script list a "show" brick
+				proj.setCatrobatLanguageVersion(0.9f);
+			}
+			if (proj.getCatrobatLanguageVersion() == 0.9f) {
+				proj.setCatrobatLanguageVersion(0.91f);
+				//no convertion needed - only change to white background
+			}
+			if (proj.getCatrobatLanguageVersion() == 0.91f) {
+				proj.setCatrobatLanguageVersion(0.92f);
+				proj.setScreenMode(ScreenModes.STRETCH);
+				checkNestingBrickReferences(false, proj);
+			}
+
+			if (proj.getCatrobatLanguageVersion() == 0.92f || proj.getCatrobatLanguageVersion() == 0.93f) {
+				//0.93 should be left out because it available unintentional for a day
+				//raise language version here to 0.94
+				proj.setCatrobatLanguageVersion(0.94f);
+			}
+			//insert further conversions here
+
+
+			checkNestingBrickReferences(true, proj);
+			if (proj.getCatrobatLanguageVersion() == Constants.CURRENT_CATROBAT_LANGUAGE_VERSION) {
+			} else {
+				throw new CompatibilityProjectException(context.getString(R.string.error_project_compatability));
+			}
+		}
+
+		return proj;
+	}
+
 	public void loadProject(String projectName, Context context) throws LoadingProjectException,
 			OutdatedVersionProjectException, CompatibilityProjectException {
 		fileChecksumContainer = new FileChecksumContainer();
@@ -425,6 +474,31 @@ public final class ProjectManager implements OnLoadProjectCompleteListener, OnCh
 
 	public void checkNestingBrickReferences(boolean assumeWrong) {
 		Project currentProject = ProjectManager.getInstance().getCurrentProject();
+		if (currentProject != null) {
+			for (Sprite currentSprite : currentProject.getSpriteList()) {
+				int numberOfScripts = currentSprite.getNumberOfScripts();
+				for (int pos = 0; pos < numberOfScripts; pos++) {
+					Script script = currentSprite.getScript(pos);
+					boolean scriptCorrect = true;
+					if (assumeWrong) {
+						scriptCorrect = false;
+					}
+					for (Brick currentBrick : script.getBrickList()) {
+						if (!scriptCorrect) {
+							continue;
+						}
+						scriptCorrect = checkReferencesOfCurrentBrick(currentBrick);
+					}
+					if (!scriptCorrect) {
+						correctAllNestedReferences(script);
+					}
+				}
+			}
+		}
+	}
+
+	public void checkNestingBrickReferences(boolean assumeWrong, Project proj) {
+		Project currentProject = proj;
 		if (currentProject != null) {
 			for (Sprite currentSprite : currentProject.getSpriteList()) {
 				int numberOfScripts = currentSprite.getNumberOfScripts();

@@ -148,7 +148,18 @@ public class StageListener implements ApplicationListener {
 
 	private byte[] thumbnail;
 
+	private boolean isLWP = false;
+
 	public StageListener() {
+	}
+
+	public StageListener(boolean lwp, Project p) {
+		if(lwp) {
+			isLWP = true;
+			this.project = p;
+		}
+		else
+			isLWP = false;
 	}
 
 	@Override
@@ -157,7 +168,10 @@ public class StageListener implements ApplicationListener {
 		font.setColor(1f, 0f, 0.05f, 1f);
 		font.setScale(1.2f);
 
-		project = ProjectManager.getInstance().getCurrentProject();
+		if(!isLWP)
+			project = ProjectManager.getInstance().getCurrentProject();
+
+
 		pathForScreenshot = Utils.buildProjectPath(project.getName()) + "/";
 
 		virtualWidth = project.getXmlHeader().virtualScreenWidth;
@@ -253,7 +267,8 @@ public class StageListener implements ApplicationListener {
 		LedUtil.reset();
 		VibratorUtil.reset();
 
-		ProjectManager.getInstance().getCurrentProject().getDataContainer().resetAllDataObjects();
+		if(!isLWP)
+			ProjectManager.getInstance().getCurrentProject().getDataContainer().resetAllDataObjects();
 
 
 		reloadProject = true;

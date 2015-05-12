@@ -28,7 +28,10 @@ import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.badlogic.gdx.backends.android.AndroidLiveWallpaperService;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -40,32 +43,51 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 
 import org.catrobat.catroid.ProjectManager;
+import org.catrobat.catroid.content.Project;
 import org.catrobat.catroid.stage.StageListener;
 
 
 /**
  * Created by marco on 17.03.15.
  */
-public class LiveWallpaperService extends AndroidLiveWallpaperService {
+public class LiveWallpaperService extends AndroidLiveWallpaperService implements Observer {
 
-	private ApplicationListener stageListener = null;
+	static Context context;
+
+	public static Context getContext() {
+		return context;
+	}
 
 	@Override
 	public void onCreateApplication() {
-		//stageListener = new StageListener();
+		Log.d("LWPService", "onCreateApplication()!");
+		this.context = this.getApplicationContext();
+		WallpaperProjectHandler.getInstance().addObserver(this);
+		//WallpaperProjectHandler.getInstance().notifyObservers();
+		this.initialize(new SelectProjectNotificationListener());
+		/*stageListener = new StageListener(true);
 		stageListener = new SelectProjectNotificationListener();
 		AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
-		//ProjectManager.getInstance().initializeDefaultProject(this.getBaseContext());
+		ProjectManager.getInstance().initializeDefaultProject(this.getBaseContext());
 		this.initialize(stageListener, config);
-		Log.d("LWP|LWPService", "LWP onCreateApplication() called");
+		Log.d("LWP|LWPService", "LWP onCreateApplication() called");*/
 	}
 
-	public void stopWallpaper() {
+	@Override
+	public void update(Observable observable, Object o) {
+		Log.d("LWP|Service", "in update called by observable!");
+		Project project = WallpaperProjectHandler.getInstance().getProject();
+		if(project == null) {
+			this.initialize(new SelectProjectNotificationListener());
+		} else {
+			this.initialize(new StageListener(true, project));
+		}
 
 	}
 
-	public void startWallpaper() {
-
+	@Override
+	public void onDestroy() {
+		WallpaperProjectHandler.getInstance().deleteObserver(this);
+		super.onDestroy();
 	}
-
 }
