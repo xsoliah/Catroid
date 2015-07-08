@@ -25,6 +25,7 @@ package org.catrobat.catroid.content.bricks;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.drawable.Drawable;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
@@ -38,9 +39,7 @@ import android.widget.TextView;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 
 import org.catrobat.catroid.R;
-
 import org.catrobat.catroid.common.BrickValues;
-
 import org.catrobat.catroid.content.Sprite;
 import org.catrobat.catroid.content.actions.ExtendedActions;
 import org.catrobat.catroid.formulaeditor.Formula;
@@ -58,7 +57,7 @@ public class LegoNxtMotorTurnAngleBrick extends FormulaBrick {
 	private transient AdapterView<?> adapterView;
 
 	public static enum Motor {
-		MOTOR_A, MOTOR_B, MOTOR_C, MOTOR_A_C
+		MOTOR_A, MOTOR_B, MOTOR_C, MOTOR_B_C
 	}
 
 	public LegoNxtMotorTurnAngleBrick() {
@@ -110,6 +109,7 @@ public class LegoNxtMotorTurnAngleBrick extends FormulaBrick {
 
 		legoSpinner.setAdapter(motorAdapter);
 		legoSpinner.setSelection(motorEnum.ordinal());
+		legoSpinner.setGravity(Gravity.CENTER);
 		return prototypeView;
 	}
 
@@ -186,6 +186,7 @@ public class LegoNxtMotorTurnAngleBrick extends FormulaBrick {
 		});
 
 		motorSpinner.setSelection(motorEnum.ordinal());
+		motorSpinner.setGravity(Gravity.CENTER);
 
 		return view;
 	}

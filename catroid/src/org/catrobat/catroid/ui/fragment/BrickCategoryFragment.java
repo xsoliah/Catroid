@@ -22,9 +22,7 @@
  */
 package org.catrobat.catroid.ui.fragment;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -105,6 +103,7 @@ public class BrickCategoryFragment extends SherlockListFragment {
 	@Override
 	public void onResume() {
 		super.onResume();
+		BottomBar.hideBottomBar(getSherlockActivity());
 		setupBrickCategories();
 	}
 
@@ -119,8 +118,6 @@ public class BrickCategoryFragment extends SherlockListFragment {
 	public void onDestroy() {
 		resetActionBar();
 		super.onDestroy();
-		BottomBar.showBottomBar(getSherlockActivity());
-		BottomBar.showPlayButton(getSherlockActivity());
 	}
 
 	@Override
@@ -153,8 +150,7 @@ public class BrickCategoryFragment extends SherlockListFragment {
 		categories.add(inflater.inflate(R.layout.brick_category_looks, null));
 		categories.add(inflater.inflate(R.layout.brick_category_data, null));
 
-		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-		if (sharedPreferences.getBoolean("setting_mindstorm_bricks", false)) {
+		if (SettingsActivity.isMindstormsNXTSharedPreferenceEnabled(getActivity())) {
 			categories.add(inflater.inflate(R.layout.brick_category_lego_nxt, null));
 		}
 
@@ -164,6 +160,10 @@ public class BrickCategoryFragment extends SherlockListFragment {
 
 		if (SettingsActivity.isDroneSharedPreferenceEnabled(getActivity(), false)) {
 			categories.add(inflater.inflate(R.layout.brick_category_drone, null));
+		}
+
+		if (SettingsActivity.isPhiroSharedPreferenceEnabled(getActivity())) {
+			categories.add(inflater.inflate(R.layout.brick_category_phiro, null));
 		}
 
 		adapter = new BrickCategoryAdapter(categories);
