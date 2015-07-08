@@ -41,7 +41,7 @@ import org.catrobat.catroid.content.bricks.FormulaBrick;
 import org.catrobat.catroid.content.bricks.GlideToBrick;
 import org.catrobat.catroid.content.bricks.GoNStepsBackBrick;
 import org.catrobat.catroid.content.bricks.IfLogicBeginBrick;
-import org.catrobat.catroid.content.bricks.LegoNxtMotorActionBrick;
+import org.catrobat.catroid.content.bricks.LegoNxtMotorMoveBrick;
 import org.catrobat.catroid.content.bricks.LegoNxtMotorTurnAngleBrick;
 import org.catrobat.catroid.content.bricks.LegoNxtPlayToneBrick;
 import org.catrobat.catroid.content.bricks.MoveNStepsBrick;
@@ -58,6 +58,7 @@ import org.catrobat.catroid.content.bricks.SetYBrick;
 import org.catrobat.catroid.content.bricks.SpeakBrick;
 import org.catrobat.catroid.content.bricks.TurnLeftBrick;
 import org.catrobat.catroid.content.bricks.TurnRightBrick;
+import org.catrobat.catroid.content.bricks.UserVariableBrick;
 import org.catrobat.catroid.content.bricks.VibrationBrick;
 import org.catrobat.catroid.content.bricks.WaitBrick;
 import org.catrobat.catroid.formulaeditor.Formula;
@@ -113,7 +114,7 @@ public class BrickCloneTest extends AndroidTestCase {
 		brick = new IfLogicBeginBrick(10);
 		brickClone(brick, Brick.BrickField.IF_CONDITION);
 
-		brick = new LegoNxtMotorActionBrick(LegoNxtMotorActionBrick.Motor.MOTOR_A, BRICK_FORMULA_VALUE);
+		brick = new LegoNxtMotorMoveBrick(LegoNxtMotorMoveBrick.Motor.MOTOR_A, BRICK_FORMULA_VALUE);
 		brickClone(brick, Brick.BrickField.LEGO_NXT_SPEED);
 
 		brick = new LegoNxtMotorTurnAngleBrick(LegoNxtMotorTurnAngleBrick.Motor.MOTOR_A, BRICK_FORMULA_VALUE);
@@ -210,7 +211,7 @@ public class BrickCloneTest extends AndroidTestCase {
 		@SuppressWarnings("unchecked")
 		T clonedBrick = (T) clonedSprite.getScript(0).getBrick(0);
 		UserVariable clonedVariable = project.getDataContainer().getUserVariable(VARIABLE_NAME, clonedSprite);
-		UserVariable clonedVariableFromBrick = (UserVariable) Reflection.getPrivateField(clonedBrick, "userVariable");
+		UserVariable clonedVariableFromBrick = (UserVariable) Reflection.getPrivateField(UserVariableBrick.class, clonedBrick, "userVariable");
 
 		// check them
 		assertNotNull("variable should be in container", clonedVariable);

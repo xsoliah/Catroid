@@ -37,8 +37,10 @@ import org.catrobat.catroid.common.FileChecksumContainer;
 import org.catrobat.catroid.common.LookData;
 import org.catrobat.catroid.common.SoundInfo;
 import org.catrobat.catroid.content.BroadcastScript;
+import org.catrobat.catroid.content.LegoNXTSetting;
 import org.catrobat.catroid.content.Project;
 import org.catrobat.catroid.content.Script;
+import org.catrobat.catroid.content.Setting;
 import org.catrobat.catroid.content.Sprite;
 import org.catrobat.catroid.content.StartScript;
 import org.catrobat.catroid.content.WhenScript;
@@ -81,7 +83,7 @@ import org.catrobat.catroid.content.bricks.IfOnEdgeBounceBrick;
 import org.catrobat.catroid.content.bricks.InsertItemIntoUserListBrick;
 import org.catrobat.catroid.content.bricks.LedOffBrick;
 import org.catrobat.catroid.content.bricks.LedOnBrick;
-import org.catrobat.catroid.content.bricks.LegoNxtMotorActionBrick;
+import org.catrobat.catroid.content.bricks.LegoNxtMotorMoveBrick;
 import org.catrobat.catroid.content.bricks.LegoNxtMotorStopBrick;
 import org.catrobat.catroid.content.bricks.LegoNxtMotorTurnAngleBrick;
 import org.catrobat.catroid.content.bricks.LegoNxtPlayToneBrick;
@@ -91,6 +93,12 @@ import org.catrobat.catroid.content.bricks.LoopEndlessBrick;
 import org.catrobat.catroid.content.bricks.MoveNStepsBrick;
 import org.catrobat.catroid.content.bricks.NextLookBrick;
 import org.catrobat.catroid.content.bricks.NoteBrick;
+import org.catrobat.catroid.content.bricks.PhiroIfLogicBeginBrick;
+import org.catrobat.catroid.content.bricks.PhiroMotorMoveBackwardBrick;
+import org.catrobat.catroid.content.bricks.PhiroMotorMoveForwardBrick;
+import org.catrobat.catroid.content.bricks.PhiroMotorStopBrick;
+import org.catrobat.catroid.content.bricks.PhiroPlayToneBrick;
+import org.catrobat.catroid.content.bricks.PhiroRGBLightBrick;
 import org.catrobat.catroid.content.bricks.PlaceAtBrick;
 import org.catrobat.catroid.content.bricks.PlaySoundBrick;
 import org.catrobat.catroid.content.bricks.PointInDirectionBrick;
@@ -133,6 +141,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.channels.FileChannel;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -181,10 +190,12 @@ public final class StorageHandler {
 		xstream.processAnnotations(Project.class);
 		xstream.processAnnotations(XmlHeader.class);
 		xstream.processAnnotations(DataContainer.class);
+		xstream.processAnnotations(Setting.class);
 		xstream.registerConverter(new XStreamConcurrentFormulaHashMapConverter());
 		xstream.registerConverter(new XStreamUserVariableConverter());
 		xstream.registerConverter(new XStreamBrickConverter(xstream.getMapper(), xstream.getReflectionProvider()));
 		xstream.registerConverter(new XStreamScriptConverter(xstream.getMapper(), xstream.getReflectionProvider()));
+		xstream.registerConverter(new XStreamSettingConverter(xstream.getMapper(), xstream.getReflectionProvider()));
 
 		setXstreamAliases();
 
@@ -257,7 +268,7 @@ public final class StorageHandler {
 		xstream.alias("brick", InsertItemIntoUserListBrick.class);
 		xstream.alias("brick", LedOffBrick.class);
 		xstream.alias("brick", LedOnBrick.class);
-		xstream.alias("brick", LegoNxtMotorActionBrick.class);
+		xstream.alias("brick", LegoNxtMotorMoveBrick.class);
 		xstream.alias("brick", LegoNxtMotorStopBrick.class);
 		xstream.alias("brick", LegoNxtMotorTurnAngleBrick.class);
 		xstream.alias("brick", LegoNxtPlayToneBrick.class);
@@ -304,9 +315,20 @@ public final class StorageHandler {
 		xstream.alias("brick", DroneMoveLeftBrick.class);
 		xstream.alias("brick", DroneMoveRightBrick.class);
 
+		xstream.alias("brick", PhiroMotorMoveBackwardBrick.class);
+		xstream.alias("brick", PhiroMotorMoveForwardBrick.class);
+		xstream.alias("brick", PhiroMotorStopBrick.class);
+		xstream.alias("brick", PhiroPlayToneBrick.class);
+		xstream.alias("brick", PhiroRGBLightBrick.class);
+		xstream.alias("brick", PhiroIfLogicBeginBrick.class);
+
 		xstream.alias("userBrickElements", UserScriptDefinitionBrickElements.class);
 		xstream.alias("userBrickElement", UserScriptDefinitionBrickElement.class);
 		xstream.alias("userBrickParameter", UserBrickParameter.class);
+
+		xstream.alias("setting", LegoNXTSetting.class);
+		xstream.alias("nxtPort", LegoNXTSetting.NXTPort.class);
+		xstream.aliasAttribute(LegoNXTSetting.NXTPort.class, "number", "number");
 
 		xstream.aliasField("formulaList", FormulaBrick.class, "formulaMap");
 		xstream.aliasField("object", BrickBaseType.class, "sprite");
@@ -333,7 +355,8 @@ public final class StorageHandler {
 			File projectCodeFile = new File(buildProjectPath(projectName), PROJECTCODE_NAME);
 			Log.d(TAG, "path: " + projectCodeFile.getAbsolutePath());
 			fileInputStream = new FileInputStream(projectCodeFile);
-			return (Project) xstream.getProjectFromXML(projectCodeFile);
+			Project project = (Project) xstream.getProjectFromXML(projectCodeFile);
+			return project;
 		} catch (Exception exception) {
 			Log.e(TAG, "Loading project " + projectName + " failed.", exception);
 			return null;
@@ -767,6 +790,9 @@ public final class StorageHandler {
 		if ((resources & Brick.ARDRONE_SUPPORT) > 0) {
 			permissionsSet.add(Constants.ARDRONE_SUPPORT);
 		}
+		if ((resources & Brick.BLUETOOTH_PHIRO) > 0) {
+			permissionsSet.add(Constants.BLUETOOTH_PHIRO_PRO);
+		}
 		if ((resources & Brick.CAMERA_LED) > 0) {
 			permissionsSet.add(Constants.CAMERA_LED);
 		}
@@ -777,5 +803,39 @@ public final class StorageHandler {
 			permissionsSet.add(Constants.FACE_DETECTION);
 		}
 		return permissionsSet;
+	}
+
+	public boolean copyImageFiles(String targetProject, String sourceProject) {
+		return copyFiles(targetProject, sourceProject, false);
+	}
+
+	public boolean copySoundFiles(String targetProject, String sourceProject) {
+		return copyFiles(targetProject, sourceProject, true);
+	}
+
+	private boolean copyFiles (String targetProject, String sourceProject, boolean copySoundFiles) {
+		String type = IMAGE_DIRECTORY;
+		if (copySoundFiles) {
+			type = SOUND_DIRECTORY;
+		}
+		File targetDirectory = new File(buildPath(buildProjectPath(targetProject), type));
+		File sourceDirectory = new File(buildPath(buildProjectPath(sourceProject), type));
+		if (!targetDirectory.exists() || !sourceDirectory.exists()) {
+			return false;
+		}
+		try {
+			for (File sourceFile : sourceDirectory.listFiles()) {
+				File targetFile = new File(targetDirectory.getAbsolutePath(), sourceFile.getName());
+				FileChannel source = new FileInputStream(sourceFile).getChannel();
+				FileChannel target = new FileOutputStream(targetFile).getChannel();
+				target.transferFrom(source, 0, source.size());
+				source.close();
+				target.close();
+			}
+		} catch (IOException e) {
+			Log.e(TAG, e.getMessage());
+			return false;
+		}
+		return true;
 	}
 }
