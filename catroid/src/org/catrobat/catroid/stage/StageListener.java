@@ -214,14 +214,12 @@ public class StageListener implements ApplicationListener {
 		if (checkIfAutomaticScreenshotShouldBeTaken) {
 			makeAutomaticScreenshot = project.manualScreenshotExists(SCREENSHOT_MANUAL_FILE_NAME);
 		}
-
 	}
 
 	void activityResume() {
 		if (!paused) {
 			FaceDetectionHandler.resumeFaceDetection();
 		}
-
 	}
 
 	void activityPause() {
@@ -270,7 +268,6 @@ public class StageListener implements ApplicationListener {
 		if(!isLWP)
 			ProjectManager.getInstance().getCurrentProject().getDataContainer().resetAllDataObjects();
 
-
 		reloadProject = true;
 	}
 
@@ -285,9 +282,8 @@ public class StageListener implements ApplicationListener {
 		}
 
 		for (Sprite sprite : sprites) {
-            sprite.look.refreshTextures();
+			sprite.look.refreshTextures();
 		}
-
 	}
 
 	@Override
@@ -382,7 +378,7 @@ public class StageListener implements ApplicationListener {
 			 * Can be removed, when EMMA is replaced by an other code coverage tool, or when a
 			 * future EMMA - update will fix the bugs.
 			 */
-			if (DYNAMIC_SAMPLING_RATE_FOR_ACTIONS == false) {
+			if (!DYNAMIC_SAMPLING_RATE_FOR_ACTIONS) {
 				stage.act(deltaTime);
 			} else {
 				float optimizedDeltaTime = deltaTime / deltaActionTimeDivisor;
@@ -630,7 +626,6 @@ public class StageListener implements ApplicationListener {
 
 			default:
 				break;
-
 		}
 		viewPort.update(ScreenValues.SCREEN_WIDTH, ScreenValues.SCREEN_HEIGHT, false);
 		camera.position.set(0, 0, 0);
@@ -661,9 +656,8 @@ public class StageListener implements ApplicationListener {
 		}
 	}
 
-	private void disposeStageButKeepActors(){
+	private void disposeStageButKeepActors() {
 		stage.unfocusAll();
 		batch.dispose();
 	}
-
 }
