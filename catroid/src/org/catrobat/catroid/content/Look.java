@@ -1,6 +1,6 @@
 /*
  * Catroid: An on-device visual programming system for Android devices
- * Copyright (C) 2010-2014 The Catrobat Team
+ * Copyright (C) 2010-2015 The Catrobat Team
  * (<http://developer.catrobat.org/credits>)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -161,7 +161,7 @@ public class Look extends Image {
 		allActionAreFinished = false;
 		int finishedCount = 0;
 
-		for (Iterator<Action> iterator = Look.actionsToRestart.iterator(); iterator.hasNext();) {
+		for (Iterator<Action> iterator = Look.actionsToRestart.iterator(); iterator.hasNext(); ) {
 			Action actionToRestart = iterator.next();
 			actionToRestart.restart();
 			iterator.remove();

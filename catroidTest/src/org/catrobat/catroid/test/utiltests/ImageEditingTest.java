@@ -1,6 +1,6 @@
 /*
  * Catroid: An on-device visual programming system for Android devices
- * Copyright (C) 2010-2014 The Catrobat Team
+ * Copyright (C) 2010-2015 The Catrobat Team
  * (<http://developer.catrobat.org/credits>)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -74,7 +74,6 @@ public class ImageEditingTest extends TestCase {
 
 		assertEquals("Wrong image width", 100, dimensions[0]);
 		assertEquals("Wrong image height", 200, dimensions[1]);
-
 	}
 
 	public void testGetBitmap() {
@@ -196,7 +195,6 @@ public class ImageEditingTest extends TestCase {
 		imageFileDimensions = ImageEditing.getImageDimensions(testImageFile.getAbsolutePath());
 		assertEquals("Width should be initial value again", bitmapWidth, imageFileDimensions[0]);
 		assertEquals("Height should be initial value again", bitmapHeight, imageFileDimensions[1]);
-
 	}
 
 	public void testRotatePicture() {
@@ -234,5 +232,4 @@ public class ImageEditingTest extends TestCase {
 		double sampleSizeHeight = ((double) originalBackgroundImageDimensions[1]) / ((double) newHeight);
 		return (1d / Math.max(sampleSizeWidth, sampleSizeHeight));
 	}
-
 }

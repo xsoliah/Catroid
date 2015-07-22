@@ -1,6 +1,6 @@
 /*
  * Catroid: An on-device visual programming system for Android devices
- * Copyright (C) 2010-2014 The Catrobat Team
+ * Copyright (C) 2010-2015 The Catrobat Team
  * (<http://developer.catrobat.org/credits>)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -143,7 +143,9 @@ public class AssertionErrorMessageTest extends TestCase {
 				+ LINE_COMMENT + ")?";
 	}
 
-	/** Test that tests the regular expressions used in the actual test (meta-test :)) */
+	/**
+	 * Test that tests the regular expressions used in the actual test (meta-test :))
+	 */
 	public void testRegex() {
 		List<String> matchingAsserts = new ArrayList<String>();
 		matchingAsserts.add("assertTrue(\"message\", parameter);");

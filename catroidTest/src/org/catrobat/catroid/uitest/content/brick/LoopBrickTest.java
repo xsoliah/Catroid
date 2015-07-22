@@ -1,6 +1,6 @@
 /*
  * Catroid: An on-device visual programming system for Android devices
- * Copyright (C) 2010-2014 The Catrobat Team
+ * Copyright (C) 2010-2015 The Catrobat Team
  * (<http://developer.catrobat.org/credits>)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -170,9 +170,8 @@ public class LoopBrickTest extends BaseActivityInstrumentationTestCase<MainMenuA
 		UiTestUtils.dragFloatingBrick(solo, 1.25f);
 
 		assertEquals("Incorrect number of bricks.", 8, projectBrickList.size());
-		assertTrue("Wrong Brick instance. expected 4=ChangeBrightnessByNBrick, bricklist: " +
-						projectBrickList.toString(), projectBrickList.get(4) instanceof ChangeBrightnessByNBrick);
-
+		assertTrue("Wrong Brick instance. expected 4=ChangeBrightnessByNBrick, bricklist: "
+				+ projectBrickList.toString(), projectBrickList.get(4) instanceof ChangeBrightnessByNBrick);
 	}
 
 	public void testNestedForeverBricks() {

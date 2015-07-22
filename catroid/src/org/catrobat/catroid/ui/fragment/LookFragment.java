@@ -1,6 +1,6 @@
 /*
  * Catroid: An on-device visual programming system for Android devices
- * Copyright (C) 2010-2014 The Catrobat Team
+ * Copyright (C) 2010-2015 The Catrobat Team
  * (<http://developer.catrobat.org/credits>)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -83,6 +83,7 @@ import org.catrobat.catroid.ui.dialogs.CustomAlertDialogBuilder;
 import org.catrobat.catroid.ui.dialogs.DeleteLookDialog;
 import org.catrobat.catroid.ui.dialogs.NewLookDialog;
 import org.catrobat.catroid.ui.dialogs.RenameLookDialog;
+import org.catrobat.catroid.utils.ToastUtil;
 import org.catrobat.catroid.utils.UtilCamera;
 import org.catrobat.catroid.utils.Utils;
 
@@ -238,7 +239,7 @@ public class LookFragment extends ScriptActivityFragment implements OnLookEditLi
 		super.onActivityCreated(savedInstanceState);
 
 		listView = getListView();
-		
+
 		if (listView != null) {
 			registerForContextMenu(listView);
 		}
@@ -253,10 +254,12 @@ public class LookFragment extends ScriptActivityFragment implements OnLookEditLi
 				lookFromCameraUri = UtilCamera.getDefaultLookFromCameraUri(defLookName);
 			}
 		}
+
 		try {
 			lookDataList = ProjectManager.getInstance().getCurrentSprite().getLookDataList();
-		} catch (NullPointerException e){
-			Log.e(TAG, e.getMessage());
+		} catch (NullPointerException nullPointerException) {
+			Log.e(TAG, Log.getStackTraceString(nullPointerException));
+			lookDataList = new ArrayList<LookData>();
 		}
 
 		if (ProjectManager.getInstance().getCurrentSpritePosition() == 0) {
@@ -289,7 +292,6 @@ public class LookFragment extends ScriptActivityFragment implements OnLookEditLi
 			menu.findItem(R.id.backpack).setVisible(false);
 			menu.findItem(R.id.unpacking).setVisible(false);
 		}
-
 
 		super.onPrepareOptionsMenu(menu);
 	}
@@ -368,7 +370,7 @@ public class LookFragment extends ScriptActivityFragment implements OnLookEditLi
 
 		ProjectManager projectManager = ProjectManager.getInstance();
 		if (projectManager.getCurrentProject() != null) {
-			projectManager.saveProject();
+			projectManager.saveProject(getActivity().getApplicationContext());
 		}
 
 		if (lookDeletedReceiver != null) {
@@ -466,7 +468,6 @@ public class LookFragment extends ScriptActivityFragment implements OnLookEditLi
 			case R.id.context_menu_delete:
 				showConfirmDeleteDialog();
 				break;
-
 		}
 		return super.onContextItemSelected(item);
 	}
@@ -694,11 +695,10 @@ public class LookFragment extends ScriptActivityFragment implements OnLookEditLi
 			startActivityForResult(intent, LookController.REQUEST_POCKET_PAINT_EDIT_IMAGE);
 		} catch (IOException ioException) {
 			Log.e(TAG, Log.getStackTraceString(ioException));
+		} catch (NullPointerException nullPointerException) {
+			Log.e(TAG, Log.getStackTraceString(nullPointerException));
+			ToastUtil.showError(getActivity(), R.string.error_load_image);
 		}
-		catch (NullPointerException e) {
-			Log.e(TAG, e.getMessage());
-		}
-
 	}
 
 	private void addSelectAllActionModeButton(ActionMode mode, Menu menu) {
@@ -713,7 +713,6 @@ public class LookFragment extends ScriptActivityFragment implements OnLookEditLi
 				adapter.notifyDataSetChanged();
 				onLookChecked();
 			}
-
 		});
 	}
 
@@ -860,7 +859,6 @@ public class LookFragment extends ScriptActivityFragment implements OnLookEditLi
 	public interface OnLookDataListChangedAfterNewListener {
 
 		void onLookDataListChangedAfterNew(LookData soundInfo);
-
 	}
 
 	private class LookDeletedReceiver extends BroadcastReceiver {

@@ -1,6 +1,6 @@
 /*
  * Catroid: An on-device visual programming system for Android devices
- * Copyright (C) 2010-2014 The Catrobat Team
+ * Copyright (C) 2010-2015 The Catrobat Team
  * (<http://developer.catrobat.org/credits>)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -57,14 +57,13 @@ import org.catrobat.catroid.content.bricks.NestingBrick;
 import org.catrobat.catroid.content.bricks.ScriptBrick;
 import org.catrobat.catroid.content.bricks.SetVariableBrick;
 import org.catrobat.catroid.content.bricks.UserBrick;
+import org.catrobat.catroid.content.bricks.UserBrickParameter;
 import org.catrobat.catroid.content.bricks.UserScriptDefinitionBrick;
-import org.catrobat.catroid.formulaeditor.Formula;
 import org.catrobat.catroid.ui.ViewSwitchLock;
 import org.catrobat.catroid.ui.dialogs.CustomAlertDialogBuilder;
 import org.catrobat.catroid.ui.dragndrop.DragAndDropListView;
 import org.catrobat.catroid.ui.dragndrop.DragAndDropListener;
 import org.catrobat.catroid.ui.fragment.AddBrickFragment;
-import org.catrobat.catroid.ui.fragment.FormulaEditorFragment;
 import org.catrobat.catroid.ui.fragment.ScriptFragment;
 
 import java.util.ArrayList;
@@ -164,8 +163,7 @@ public class BrickAdapter extends BaseAdapter implements DragAndDropListener, On
 			if (brick.getClass().equals(ChangeVariableBrick.class)) {
 				ChangeVariableBrick changeVariableBrick = (ChangeVariableBrick) brick;
 				changeVariableBrick.setInUserBrick(true);
-			}
-			else if (brick.getClass().equals(SetVariableBrick.class)) {
+			} else if (brick.getClass().equals(SetVariableBrick.class)) {
 				SetVariableBrick setVariableBrick = (SetVariableBrick) brick;
 				setVariableBrick.setInUserBrick(true);
 			}
@@ -381,24 +379,24 @@ public class BrickAdapter extends BaseAdapter implements DragAndDropListener, On
 			if (draggedBrick instanceof UserBrick) {
 				int positionOfUserbrickInScript = 0;
 				for (int index = 0; index <= to; index++) {
-					if (brickList.get(index) instanceof UserBrick && ((UserBrick)brickList.get(index)).getUserBrickId() == ((UserBrick) draggedBrick).getUserBrickId()) {
+					if (brickList.get(index) instanceof UserBrick && ((UserBrick) brickList.get(index)).getUserBrickId() == ((UserBrick) draggedBrick).getUserBrickId()) {
 						positionOfUserbrickInScript++;
 					}
 				}
-				for (int parameterIndex = 0; parameterIndex < ProjectManager.getInstance().getCurrentProject().getUserVariables().getOrCreateVariableListForUserBrick(((UserBrick) draggedBrick).getUserBrickId()).size(); parameterIndex++) {
+				for (int parameterIndex = 0; parameterIndex < ProjectManager.getInstance().getCurrentProject().getDataContainer().getOrCreateVariableListForUserBrick(((UserBrick) draggedBrick).getUserBrickId()).size(); parameterIndex++) {
 					((UserBrick) draggedBrick).addUserBrickPositionToParameter(Pair.create(positionOfUserbrickInScript, parameterIndex));
 				}
 
-				ArrayList<Pair<Integer,Integer>> userBrickPositionToParameterList = ((UserBrick) draggedBrick).getUserBrickPositionToParameter();
+				ArrayList<Pair<Integer, Integer>> userBrickPositionToParameterList = ((UserBrick) draggedBrick).getUserBrickPositionToParameter();
 
 				int numberOfUserBricksInScript = userBrickPositionToParameterList.size();
 				int frequencyOfEqualFirstParameters = 0;
 				for (int newIndex = 0; newIndex < userBrickPositionToParameterList.size(); newIndex++) {
-					if (userBrickPositionToParameterList.get(newIndex).first == userBrickPositionToParameterList.get(numberOfUserBricksInScript-1).first) {
+					if (userBrickPositionToParameterList.get(newIndex).first == userBrickPositionToParameterList.get(numberOfUserBricksInScript - 1).first) {
 						frequencyOfEqualFirstParameters++;
 					}
 				}
-				if (frequencyOfEqualFirstParameters != ProjectManager.getInstance().getCurrentProject().getUserVariables().getOrCreateVariableListForUserBrick(((UserBrick) draggedBrick).getUserBrickId()).size()) {
+				if (frequencyOfEqualFirstParameters != ProjectManager.getInstance().getCurrentProject().getDataContainer().getOrCreateVariableListForUserBrick(((UserBrick) draggedBrick).getUserBrickId()).size()) {
 					for (int userBrickPosition = positionOfUserbrickInScript; userBrickPosition < numberOfUserBricksInScript; userBrickPosition++) {
 						Pair<Integer, Integer> userBrickPositionToParameter = ((UserBrick) draggedBrick).getUserBrickPositionToParameter().get(userBrickPosition);
 						if (userBrickPositionToParameter.first >= userBrickPosition) {
@@ -649,7 +647,6 @@ public class BrickAdapter extends BaseAdapter implements DragAndDropListener, On
 		} else {
 			list.smoothScrollToPosition(brickList.size() - 1, position - 2);
 		}
-
 	}
 
 	public void addNewBrick(int position, Brick brickToBeAdded, boolean initInsertedBrick) {
@@ -681,15 +678,12 @@ public class BrickAdapter extends BaseAdapter implements DragAndDropListener, On
 			brickList.remove(brickToBeAdded);
 			brickList.add(position, brickToBeAdded);
 			scrollToPosition(position);
-
-		}
-		else {
+		} else {
 
 			position = getNewPositionIfEndingBrickIsThere(position, brickToBeAdded);
 			position = position <= 0 ? 1 : position;
 			position = position > brickList.size() ? brickList.size() : position;
 			brickList.add(position, brickToBeAdded);
-
 		}
 
 		this.initInsertedBrick = initInsertedBrick;
@@ -871,7 +865,8 @@ public class BrickAdapter extends BaseAdapter implements DragAndDropListener, On
 
 		// Hack!!!
 		// if wrapper isn't used the longClick event won't be triggered
-		@SuppressLint("ViewHolder") ViewGroup wrapper = (ViewGroup) View.inflate(context, R.layout.brick_wrapper, null);
+		@SuppressLint("ViewHolder")
+		ViewGroup wrapper = (ViewGroup) View.inflate(context, R.layout.brick_wrapper, null);
 		if (currentBrickView.getParent() != null) {
 			((ViewGroup) currentBrickView.getParent()).removeView(currentBrickView);
 		}
@@ -925,15 +920,24 @@ public class BrickAdapter extends BaseAdapter implements DragAndDropListener, On
 		if (index >= 0 && index < brickList.size() && brickList.get(index) instanceof ScriptBrick
 				&& draggedBrick == null) {
 			int scriptIndex = getScriptIndexFromProject(index);
+			if (scriptIndex == -1) {
+				Log.e(TAG, "setTouchedScript() Could not get ScriptIndex. index was " + index);
+				return;
+			}
 			ProjectManager.getInstance().setCurrentScript(sprite.getScript(scriptIndex));
 		}
 	}
 
 	private int getScriptIndexFromProject(int index) {
 		int scriptIndex = 0;
+		Script temporaryScript = null;
 		for (int i = 0; i < index; ) {
-
-			i += sprite.getScript(scriptIndex).getBrickList().size() + 1;
+			temporaryScript = sprite.getScript(scriptIndex);
+			if (temporaryScript == null) {
+				Log.e(TAG, "getScriptIndexFromProject() tmpScript was null. Index was " + index + " scriptIndex was " + scriptIndex);
+				return -1;
+			}
+			i += temporaryScript.getBrickList().size() + 1;
 			if (i <= index) {
 				scriptIndex++;
 			}
@@ -1036,7 +1040,6 @@ public class BrickAdapter extends BaseAdapter implements DragAndDropListener, On
 				} else if (clickedItemText.equals(context.getText(R.string.brick_context_dialog_formula_edit_brick))) {
 					clickedEditFormula(brickList.get(itemPosition), view);
 				}
-				
 			}
 		});
 		alertDialog = builder.create();
@@ -1101,19 +1104,19 @@ public class BrickAdapter extends BaseAdapter implements DragAndDropListener, On
 	}
 
 	private void clickedEditFormula(Brick brick, View view) {
-		Formula formula = null;
+		FormulaBrick formulaBrick = null;
 		if (brick instanceof FormulaBrick) {
-			formula = ((FormulaBrick) brick).getFormula();
+			formulaBrick = (FormulaBrick) brick;
 		}
 		if (brick instanceof UserBrick) {
-			List<Formula> formulas = ((UserBrick) brick).getFormulas();
-			if (formulas.size() > 0) {
-				formula = formulas.get(0);
+			List<UserBrickParameter> userBrickParameters = ((UserBrick) brick).getUserBrickParameters();
+			if (userBrickParameters != null && userBrickParameters.size() > 0) {
+				formulaBrick = userBrickParameters.get(0);
 			}
 		}
 
-		if (formula != null) {
-			FormulaEditorFragment.showFragment(view, brick, formula);
+		if (formulaBrick != null) {
+			formulaBrick.showFormulaEditorToEditFormula(view);
 		}
 	}
 
@@ -1211,11 +1214,12 @@ public class BrickAdapter extends BaseAdapter implements DragAndDropListener, On
 	public void setCheckboxVisibility(int visibility) {
 		int index = 0;
 
-		if (ProjectManager.getInstance().getCurrentUserBrick() != null && brickList.get(0).equals(ProjectManager.getInstance().getCurrentUserBrick().getDefinitionBrick())) {
+		if (ProjectManager.getInstance().getCurrentUserBrick() != null
+				&& brickList.size() > 0
+				&& brickList.get(0).equals(ProjectManager.getInstance().getCurrentUserBrick().getDefinitionBrick())) {
 			index = 1;
 		}
-		for (; index < brickList.size(); index++)
-		{
+		for (; index < brickList.size(); index++) {
 			brickList.get(index).setCheckboxVisibility(visibility);
 		}
 	}
@@ -1356,7 +1360,6 @@ public class BrickAdapter extends BaseAdapter implements DragAndDropListener, On
 
 					@Override
 					public void onAnimationRepeat(Animation animation) {
-
 					}
 
 					@Override
@@ -1372,7 +1375,6 @@ public class BrickAdapter extends BaseAdapter implements DragAndDropListener, On
 					view.startAnimation(animation);
 				}
 			}
-
 		}
 		animatedBricks.clear();
 	}

@@ -1,6 +1,6 @@
 /*
  * Catroid: An on-device visual programming system for Android devices
- * Copyright (C) 2010-2014 The Catrobat Team
+ * Copyright (C) 2010-2015 The Catrobat Team
  * (<http://developer.catrobat.org/credits>)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -24,7 +24,6 @@ package org.catrobat.catroid.test.content.sprite;
 
 import android.test.AndroidTestCase;
 import android.util.Log;
-
 
 import org.catrobat.catroid.ProjectManager;
 import org.catrobat.catroid.content.Project;
@@ -70,11 +69,11 @@ public class SpriteTest extends AndroidTestCase {
 		sprite = new Sprite("testSprite");
 		project = new Project(getContext(), TestUtils.DEFAULT_TEST_PROJECT_NAME);
 		project.addSprite(sprite);
-		project.getUserVariables().addSpriteUserVariableToSprite(sprite, LOCAL_VARIABLE_NAME);
-		project.getUserVariables().getUserVariable(LOCAL_VARIABLE_NAME, sprite).setValue(LOCAL_VARIABLE_VALUE);
+		project.getDataContainer().addSpriteUserVariableToSprite(sprite, LOCAL_VARIABLE_NAME);
+		project.getDataContainer().getUserVariable(LOCAL_VARIABLE_NAME, sprite).setValue(LOCAL_VARIABLE_VALUE);
 
-		project.getUserVariables().addProjectUserVariable(GLOBAL_VARIABLE_NAME);
-		project.getUserVariables().getUserVariable(GLOBAL_VARIABLE_NAME, null).setValue(GLOBAL_VARIABLE_VALUE);
+		project.getDataContainer().addProjectUserVariable(GLOBAL_VARIABLE_NAME);
+		project.getDataContainer().getUserVariable(GLOBAL_VARIABLE_NAME, null).setValue(GLOBAL_VARIABLE_VALUE);
 
 		ProjectManager.getInstance().setProject(project);
 	}
@@ -87,12 +86,12 @@ public class SpriteTest extends AndroidTestCase {
 		sprite.addScript(script);
 		Sprite clonedSprite = sprite.clone();
 
-		UserVariable clonedVariable = project.getUserVariables().getUserVariable(LOCAL_VARIABLE_NAME, clonedSprite);
+		UserVariable clonedVariable = project.getDataContainer().getUserVariable(LOCAL_VARIABLE_NAME, clonedSprite);
 		assertNotNull("local variable isn't copied properly", clonedVariable);
 		assertEquals("variable not cloned properly", LOCAL_VARIABLE_NAME, clonedVariable.getName());
 		assertEquals("variable not cloned properly", LOCAL_VARIABLE_VALUE, clonedVariable.getValue());
 
-		List<UserVariable> userVariableList = project.getUserVariables().getOrCreateVariableListForSprite(clonedSprite);
+		List<UserVariable> userVariableList = project.getDataContainer().getOrCreateVariableListForSprite(clonedSprite);
 		Set<String> hashSet = new HashSet<String>();
 		for (UserVariable userVariable : userVariableList) {
 			assertTrue("Variable already exists", hashSet.add(userVariable.getName()));
@@ -299,7 +298,6 @@ public class SpriteTest extends AndroidTestCase {
 
 		assertEquals("Wrong script list size", 1, sprite.getNumberOfScripts());
 		assertEquals("Wrong script remained", secondScript, sprite.getScript(0));
-
 	}
 
 	public void testGetScriptIndex() {
@@ -341,7 +339,5 @@ public class SpriteTest extends AndroidTestCase {
 		while (!testSprite.look.getAllActionsAreFinished()) {
 			testSprite.look.act(1.0f);
 		}
-
 	}
-
 }

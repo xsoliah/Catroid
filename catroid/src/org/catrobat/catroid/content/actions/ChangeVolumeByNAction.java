@@ -1,6 +1,6 @@
 /*
  * Catroid: An on-device visual programming system for Android devices
- * Copyright (C) 2010-2014 The Catrobat Team
+ * Copyright (C) 2010-2015 The Catrobat Team
  * (<http://developer.catrobat.org/credits>)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -41,9 +41,9 @@ public class ChangeVolumeByNAction extends TemporalAction {
 		try {
 			Float newVolume = volume == null ? Float.valueOf(0f) : volume.interpretFloat(sprite);
 			SoundManager.getInstance().setVolume(SoundManager.getInstance().getVolume() + newVolume);
-        } catch (InterpretationException interpretationException) {
-            Log.d(getClass().getSimpleName(), "Formula interpretation for this specific Brick failed.", interpretationException);
-        }
+		} catch (InterpretationException interpretationException) {
+			Log.d(getClass().getSimpleName(), "Formula interpretation for this specific Brick failed.", interpretationException);
+		}
 	}
 
 	public void setVolume(Formula volume) {
@@ -53,5 +53,4 @@ public class ChangeVolumeByNAction extends TemporalAction {
 	public void setSprite(Sprite sprite) {
 		this.sprite = sprite;
 	}
-
 }

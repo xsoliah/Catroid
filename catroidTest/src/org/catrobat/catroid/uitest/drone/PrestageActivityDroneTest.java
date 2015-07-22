@@ -1,6 +1,6 @@
 /*
  * Catroid: An on-device visual programming system for Android devices
- * Copyright (C) 2010-2014 The Catrobat Team
+ * Copyright (C) 2010-2015 The Catrobat Team
  * (<http://developer.catrobat.org/credits>)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -44,18 +44,20 @@ package org.catrobat.catroid.uitest.drone;
 //import org.catrobat.catroid.stage.PreStageActivity;
 //import org.catrobat.catroid.stage.StageActivity;
 //import org.catrobat.catroid.test.drone.DroneTestUtils;
+
 import org.catrobat.catroid.ui.MainMenuActivity;
+import org.catrobat.catroid.uitest.util.BaseActivityInstrumentationTestCase;
+
 //import org.catrobat.catroid.ui.ProjectActivity;
 //import org.catrobat.catroid.ui.SettingsActivity;
 //import org.catrobat.catroid.uitest.annotation.Device;
-import org.catrobat.catroid.uitest.util.BaseActivityInstrumentationTestCase;
 //import org.catrobat.catroid.uitest.util.Reflection;
 //import org.catrobat.catroid.uitest.util.UiTestUtils;
 //import org.mockito.Mockito;
 
 public class PrestageActivityDroneTest extends BaseActivityInstrumentationTestCase<MainMenuActivity> {
 
-//	private enum ActivityUnderTest {
+	//	private enum ActivityUnderTest {
 //		PRE_STAGE, STAGE
 //	}
 //
@@ -72,7 +74,7 @@ public class PrestageActivityDroneTest extends BaseActivityInstrumentationTestCa
 		super(MainMenuActivity.class);
 	}
 
-	public void testThisTestmethodIsOnlyHereForPassingTheSourceTest(){
+	public void testThisTestmethodIsOnlyHereForPassingTheSourceTest() {
 		assertSame("Remove me!!", "Remove me!!", "Remove me!!");
 	}
 //

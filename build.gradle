@@ -6,8 +6,8 @@ buildscript {
         mavenLocal()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.12.+'
-        classpath 'com.jakewharton.sdkmanager:gradle-plugin:0.10.+'
+        classpath 'com.android.tools.build:gradle:1.0.1'
+        classpath 'com.jakewharton.sdkmanager:gradle-plugin:0.12.+'
     }
 }
 
@@ -32,11 +32,14 @@ ext {
     roboVMVersion = '0.0.14'
     featuresEnabled = [
             "lego_nxt"                          : true,
+            "phiro"                             : true,
+            "led_brick"                         : false,
+            "vibration_brick"                   : false,
             "backpack"                          : false,
             "parrot_ar_drone"                   : false,
             "apk_generator"                     : false,
             "computer_vision_enhancement"       : true,
-            "formula_editor_lists"              : false,
+            "formula_editor_lists"              : true,
             "physics_engine_collision_filtering": false,
             "time_capsule"                      : false,
             "userbricks"                        : false
@@ -53,27 +56,52 @@ repositories {
 configurations {
     natives
     compile.exclude group: 'xpp3' //compile problem with xstream
+    natives
 }
 
 
 dependencies {
     compile 'com.actionbarsherlock:actionbarsherlock:4.4.0@aar'
     compile 'com.android.support:support-v4:19.1.0'
-    compile "com.badlogicgames.gdx:gdx:$gdxVersion"
-    compile "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
-    compile 'com.google.guava:guava:17.0'
-    natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi"
-    natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a"
-    natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86"
-    compile fileTree(dir: 'catroid/libs', include: '*.jar')
-    compile fileTree(dir: 'catroid/libs-natives', include: '*.jar')
-    compile fileTree(dir: 'catroidTest/libs', include: '*.jar')
+    compile 'com.google.guava:guava:18.0'
+    compile 'com.squareup.okhttp:okhttp:2.3.0'
+    compile 'com.google.code.gson:gson:2.3.1'
+    compile 'com.github.johnpersano:supertoasts:1.3.4@aar'
+    compile 'com.thoughtworks.xstream:xstream:1.4.7'
+    def gdxVersion = '1.6.2'
+    compile 'com.badlogicgames.gdx:gdx:' + gdxVersion
+    compile 'com.badlogicgames.gdx:gdx-backend-android:' + gdxVersion
+    natives 'com.badlogicgames.gdx:gdx-platform:' + gdxVersion + ':natives-x86'
+    natives 'com.badlogicgames.gdx:gdx-platform:' + gdxVersion + ':natives-armeabi'
+    natives 'com.badlogicgames.gdx:gdx-platform:' + gdxVersion + ':natives-armeabi-v7a'
+    compile fileTree(include: '*.jar', dir: 'catroid/libs')
+    compile fileTree(include: '*.jar', dir: 'catroid/libs-natives')
+    androidTestCompile fileTree(include: '*.jar', dir: 'catroidTest/libs')
     androidTestCompile 'com.jayway.android.robotium:robotium-solo:5.2.1'
+    androidTestCompile 'com.google.dexmaker:dexmaker-mockito:1.2'
+    androidTestCompile 'org.mockito:mockito-core:1.10.19'
     pmd 'net.sourceforge.pmd:pmd:5.1.1'
+	checkstyle 'com.puppycrawl.tools:checkstyle:6.7'
 }
 
-// workarround ndk support for libgdx1.2.0
-apply from: 'gradle/copy_natives_tasks.gradle'
+task copyAndroidNatives() {
+    file("catroid/jniLibs/armeabi/").mkdirs();
+    file("catroid/jniLibs/armeabi-v7a/").mkdirs();
+    file("catroid/jniLibs/x86/").mkdirs();
+    configurations.natives.files.each { jar ->
+        def outputDir = null
+        if(jar.name.endsWith("natives-armeabi-v7a.jar")) outputDir = file("catroid/jniLibs/armeabi-v7a")
+        if(jar.name.endsWith("natives-armeabi.jar")) outputDir = file("catroid/jniLibs/armeabi")
+        if(jar.name.endsWith("natives-x86.jar")) outputDir = file("catroid/jniLibs/x86")
+        if(outputDir != null) {
+            copy {
+                from zipTree(jar)
+                into outputDir
+                include "*.so"
+            }
+        }
+    }
+}
 
 def getBuildNumberParameter = { ->
     def code = project.hasProperty('versionCode') ? versionCode.toInteger() : -1
@@ -108,20 +136,19 @@ def getCurrentGitBranch() {
 
 
 android {
-    compileSdkVersion 19
-    buildToolsVersion '19.1.0'
+    compileSdkVersion 22
+    buildToolsVersion '22.0.1'
     defaultConfig {
-        minSdkVersion 10
-        targetSdkVersion 19
-        applicationId 'org.catrobat.catroidLWP' +
-                ''
+        minSdkVersion 16
+        targetSdkVersion 22
+        applicationId 'org.catrobat.catroid'
         testApplicationId "org.catrobat.catroid.test"
         testInstrumentationRunner 'pl.polidea.instrumentation.PolideaInstrumentationTestRunner'
-        versionCode getBuildNumberParameter()
+        versionCode 23
         println "VersionCode is " + versionCode
-        versionName generateVersionName(projectVersion, versionCode)
+        versionName "0.9.16"
         println "VersionName is " + versionName
-        buildConfigField "String", "GIT_DESCRIBE", "\"${getGitDescribe()}\""
+        buildConfigField "String", "GIT_DESCRIBE", "\"${versionName}\""
         buildConfigField "String", "GIT_CURRENT_BRANCH", "\"${getCurrentGitBranch()}\""
     }
     sourceSets {
@@ -133,6 +160,7 @@ android {
             renderscript.srcDirs = ['catroid/src']
             res.srcDirs = ['catroid/res']
             assets.srcDirs = ['catroid/assets']
+            jniLibs.srcDirs = ['catroid/jniLibs']
         }
 
         androidTest {
@@ -161,28 +189,21 @@ android {
         // all general ignores should be added in this place
         // CommitPrefEdits should be reviewed, if using apply instead of commit is working with our tests
         // OldTargetApi should be reviewed - consider updating target API to 20
+        // RtlSymmetry/RtlHardcoded should be reviewed
+        // GradleDynamicVersion ignored - e.g. according to sdkmanager:gradle-plugin it should be imported this way
+        // IconMissingDensityFolder - currently no xxxhdpi icons available
+        // TODO ticket for HandlerLeak
+        // TODO don't know if WrongRegion warning is a false-positive one
         ignore 'ContentDescription', 'InvalidPackage', 'ValidFragment', 'GradleDependency',
-                'ClickableViewAccessibility', 'UnusedAttribute', 'CommitPrefEdits', 'OldTargetApi'
+                'ClickableViewAccessibility', 'UnusedAttribute', 'CommitPrefEdits', 'OldTargetApi',
+                'RtlSymmetry', 'GradleDynamicVersion', 'RtlHardcoded', 'HandlerLeak', 'IconMissingDensityFolder',
+                'WrongRegion', 'RelativeOverlap', 'IconColors', 'MissingTranslation'
 
         textReport true
         xmlReport true
         htmlReport false
         xmlOutput file("build/reports/lint.xml")
     }
-}
-
-// needed to add JNI shared libraries to APK when compiling on CLI (needed for libgdx)
-tasks.withType(com.android.build.gradle.tasks.PackageApplication) { pkgTask ->
-    pkgTask.jniFolders = new HashSet<File>()
-    pkgTask.jniFolders.add(new File(projectDir, 'libs'))
-}
-
-
-
-// needed to add JNI shared libraries to APK when compiling on CLI (needed for libgdx)
-tasks.withType(com.android.build.gradle.tasks.PackageApplication) { pkgTask ->
-    pkgTask.jniFolders = new HashSet<File>()
-    pkgTask.jniFolders.add(new File(projectDir, 'libs'))
 }
 
 if (project.hasProperty('jenkins')) {
@@ -197,13 +218,16 @@ if (project.hasProperty('jenkins')) {
     //not a jenkins build, remove animation scale permission
     android.applicationVariants.all { variant ->
         println "Removing the SET_ANIMATION_SCALE permission for $variant.name"
-        variant.processManifest.doLast {
-            def generatedContent = manifestOutputFile.getText()
-            generatedContent = generatedContent.replace('<uses-permission android:name="android.permission.SET_ANIMATION_SCALE" />', '')
-            if (generatedContent.contains('SET_ANIMATION_SCALE')) {
-                throw new RuntimeException("Error in removing animation scale permission!")
+        variant.outputs.each { output ->
+            output.processManifest.doLast {
+                def generatedContent = manifestOutputFile.getText()
+                generatedContent = generatedContent.replace('<uses-permission android:name="android.permission.SET_ANIMATION_SCALE" />', '')
+                if (generatedContent.contains('SET_ANIMATION_SCALE')) {
+                    throw new RuntimeException("Error in removing animation scale permission!")
+                }
+                manifestOutputFile.write(generatedContent)
             }
-            manifestOutputFile.write(generatedContent)
+
         }
     }
 }
@@ -252,4 +276,3 @@ def signing_config_file = file(System.getProperty("user.home") + "/.catrobat/cat
 if (signing_config_file.exists()) {
     apply from: signing_config_file.absolutePath
 }
-

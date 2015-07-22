@@ -1,6 +1,6 @@
 /*
  * Catroid: An on-device visual programming system for Android devices
- * Copyright (C) 2010-2014 The Catrobat Team
+ * Copyright (C) 2010-2015 The Catrobat Team
  * (<http://developer.catrobat.org/credits>)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -43,7 +43,6 @@ public class ClearGraphicEffectBrick extends BrickBaseType {
 	private static final long serialVersionUID = 1L;
 
 	public ClearGraphicEffectBrick() {
-
 	}
 
 	@Override
@@ -91,7 +90,6 @@ public class ClearGraphicEffectBrick extends BrickBaseType {
 			clearGraphicEffectLabel.setTextColor(clearGraphicEffectLabel.getTextColors().withAlpha(alphaValue));
 
 			this.alphaValue = (alphaValue);
-
 		}
 
 		return view;
@@ -113,5 +111,4 @@ public class ClearGraphicEffectBrick extends BrickBaseType {
 		sequence.addAction(ExtendedActions.clearGraphicEffect(sprite));
 		return null;
 	}
-
 }

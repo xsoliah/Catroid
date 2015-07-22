@@ -1,6 +1,6 @@
 /*
  * Catroid: An on-device visual programming system for Android devices
- * Copyright (C) 2010-2014 The Catrobat Team
+ * Copyright (C) 2010-2015 The Catrobat Team
  * (<http://developer.catrobat.org/credits>)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -444,7 +444,7 @@ public class MainMenuActivityTest extends BaseActivityInstrumentationTestCase<Ma
 		ProjectManager.getInstance().setCurrentScript(startingScript);
 		StorageHandler.getInstance().saveProject(standardProject);
 
-		UiTestUtils.goBackToHome(getInstrumentation());
+		solo.goBack();
 		solo.waitForActivity(MainMenuActivity.class.getSimpleName());
 		solo.sleep(300);
 		SharedPreferences defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getInstrumentation()
@@ -494,7 +494,6 @@ public class MainMenuActivityTest extends BaseActivityInstrumentationTestCase<Ma
 		solo.waitForActivity(MainMenuActivity.class.getSimpleName());
 		assertTrue("The name of the current testProject2 is not displayed on the continue button", solo.getButton(0)
 				.getText().toString().endsWith(testProject2));
-
 	}
 
 	public void testProjectNameWithNormalAndSpecialCharsVisible() {

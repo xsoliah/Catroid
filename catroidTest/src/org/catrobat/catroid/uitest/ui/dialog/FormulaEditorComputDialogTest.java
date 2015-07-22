@@ -1,6 +1,6 @@
 /*
  * Catroid: An on-device visual programming system for Android devices
- * Copyright (C) 2010-2014 The Catrobat Team
+ * Copyright (C) 2010-2015 The Catrobat Team
  * (<http://developer.catrobat.org/credits>)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -55,17 +55,17 @@ public class FormulaEditorComputDialogTest extends BaseActivityInstrumentationTe
 		solo.clickOnView(solo.getView(R.id.formula_editor_keyboard_compute));
 	}
 
-	public void testDialogCreation(){
+	public void testDialogCreation() {
 		assertTrue("Dialog not loaded!",
-				solo.searchText(testInteger + solo.getString(R.string.formula_editor_decimal_mark) + "0" , true));
+				solo.searchText(testInteger + solo.getString(R.string.formula_editor_decimal_mark) + "0", true));
 	}
 
 	public void testCancelOnTouchInsideOfDialog() {
 		solo.clickOnText(testInteger.toString());
 		solo.waitForFragmentByTag(FormulaEditorFragment.FORMULA_EDITOR_FRAGMENT_TAG);
 		assertTrue("Dialog not canceled!", solo.searchText(testInteger.toString(), true));
-		assertFalse("Dialog not canceled!", solo.searchText(testInteger +
-				solo.getString(R.string.formula_editor_decimal_mark) + "0", true));
+		assertFalse("Dialog not canceled!",
+				solo.searchText(testInteger + solo.getString(R.string.formula_editor_decimal_mark) + "0", true));
 		assertEquals("Wrong string in Formula Editor edit text!", testInteger + " ",
 				solo.getEditText(FORMULA_EDITOR_EDIT_TEXT_ID).getText().toString());
 	}
@@ -75,8 +75,8 @@ public class FormulaEditorComputDialogTest extends BaseActivityInstrumentationTe
 		solo.clickOnScreen(100, 100, 1);
 		solo.waitForFragmentByTag(FormulaEditorFragment.FORMULA_EDITOR_FRAGMENT_TAG);
 		assertTrue("Dialog not canceled!", solo.searchText(testInteger.toString(), true));
-		assertFalse("Dialog not canceled!", solo.searchText(testInteger +
-				solo.getString(R.string.formula_editor_decimal_mark) + "0" , true));
+		assertFalse("Dialog not canceled!", solo.searchText(
+				testInteger + solo.getString(R.string.formula_editor_decimal_mark) + "0", true));
 		assertEquals("Wrong string in Formula Editor edit text!", testInteger + " ",
 				solo.getEditText(FORMULA_EDITOR_EDIT_TEXT_ID).getText().toString());
 	}

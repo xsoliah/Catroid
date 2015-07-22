@@ -1,6 +1,6 @@
 /*
  * Catroid: An on-device visual programming system for Android devices
- * Copyright (C) 2010-2014 The Catrobat Team
+ * Copyright (C) 2010-2015 The Catrobat Team
  * (<http://developer.catrobat.org/credits>)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -45,7 +45,6 @@ public class WhenBrick extends ScriptBrick {
 	}
 
 	public WhenBrick() {
-
 	}
 
 	@Override
@@ -138,7 +137,6 @@ public class WhenBrick extends ScriptBrick {
 			Drawable background = layout.getBackground();
 			background.setAlpha(alphaValue);
 			this.alphaValue = (alphaValue);
-
 		}
 
 		return view;
@@ -166,6 +164,5 @@ public class WhenBrick extends ScriptBrick {
 	@Override
 	public List<SequenceAction> addActionToSequence(Sprite sprite, SequenceAction sequence) {
 		return null;
-
 	}
 }

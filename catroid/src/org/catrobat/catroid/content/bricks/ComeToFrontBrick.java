@@ -1,6 +1,6 @@
 /*
  * Catroid: An on-device visual programming system for Android devices
- * Copyright (C) 2010-2014 The Catrobat Team
+ * Copyright (C) 2010-2015 The Catrobat Team
  * (<http://developer.catrobat.org/credits>)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -42,7 +42,6 @@ public class ComeToFrontBrick extends BrickBaseType {
 	private static final long serialVersionUID = 1L;
 
 	public ComeToFrontBrick() {
-
 	}
 
 	@Override
@@ -90,7 +89,6 @@ public class ComeToFrontBrick extends BrickBaseType {
 
 			TextView goFrontLabel = (TextView) view.findViewById(R.id.brick_go_to_front_label);
 			goFrontLabel.setTextColor(goFrontLabel.getTextColors().withAlpha(alphaValue));
-
 		}
 
 		return view;

@@ -1,6 +1,6 @@
 /*
  * Catroid: An on-device visual programming system for Android devices
- * Copyright (C) 2010-2014 The Catrobat Team
+ * Copyright (C) 2010-2015 The Catrobat Team
  * (<http://developer.catrobat.org/credits>)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -156,6 +156,8 @@ public class BroadcastReceiverBrick extends ScriptBrick implements BroadcastMess
 		Spinner broadcastReceiverSpinner = (Spinner) prototypeView.findViewById(R.id.brick_broadcast_receive_spinner);
 		broadcastReceiverSpinner.setFocusableInTouchMode(false);
 		broadcastReceiverSpinner.setFocusable(false);
+		broadcastReceiverSpinner.setEnabled(false);
+
 		SpinnerAdapter broadcastReceiverSpinnerAdapter = MessageContainer.getMessageAdapter(context);
 		broadcastReceiverSpinner.setAdapter(broadcastReceiverSpinnerAdapter);
 		setSpinnerSelection(broadcastReceiverSpinner);
@@ -171,7 +173,6 @@ public class BroadcastReceiverBrick extends ScriptBrick implements BroadcastMess
 			Drawable background = layout.getBackground();
 			background.setAlpha(alphaValue);
 			this.alphaValue = (alphaValue);
-
 		}
 		return view;
 	}
@@ -186,7 +187,7 @@ public class BroadcastReceiverBrick extends ScriptBrick implements BroadcastMess
 		spinner.setSelection(position, true);
 	}
 
-    // TODO: BroadcastBrick and BroadcastReceiverBrick contain this identical method.
+	// TODO: BroadcastBrick and BroadcastReceiverBrick contain this identical method.
 	private void showNewMessageDialog(final Spinner spinner) {
 		final Context context = spinner.getContext();
 		BrickTextDialog editDialog = new BrickTextDialog() {

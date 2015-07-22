@@ -1,6 +1,6 @@
 /*
  * Catroid: An on-device visual programming system for Android devices
- * Copyright (C) 2010-2014 The Catrobat Team
+ * Copyright (C) 2010-2015 The Catrobat Team
  * (<http://developer.catrobat.org/credits>)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -41,13 +41,14 @@ import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.BitmapFont.TextBounds;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
-import com.badlogic.gdx.utils.viewport.StretchViewport;
-import com.bitfire.postprocessing.PostProcessor;
-import com.bitfire.utils.ShaderLoader;
+import com.badlogic.gdx.utils.viewport.ScalingViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 import com.google.common.collect.Multimap;
 
 import org.catrobat.catroid.ProjectHandler;
@@ -81,6 +82,7 @@ import java.util.Map;
 
 public class StageListener implements ApplicationListener, AndroidWallpaperListener {
 
+	private static final String TAG = StageListener.class.getSimpleName();
 	private static final int AXIS_WIDTH = 4;
 	private static final float DELTA_ACTIONS_DIVIDER_MAXIMUM = 50f;
 	private static final int ACTIONS_COMPUTATION_TIME_MAXIMUM = 8;
@@ -125,6 +127,7 @@ public class StageListener implements ApplicationListener, AndroidWallpaperListe
 	private Batch batch;
 	private BitmapFont font;
 	private Passepartout passepartout;
+	private Viewport viewPort;
 
 	private List<Sprite> sprites;
 
@@ -220,7 +223,7 @@ public class StageListener implements ApplicationListener, AndroidWallpaperListe
 	public void create() {
 		font = new BitmapFont();
 		font.setColor(1f, 0f, 0.05f, 1f);
-		font.setScale(1.2f);
+		font.getData().setScale(1.2f);
 
 		project = null;
 		if (!isLWP) {
@@ -236,10 +239,10 @@ public class StageListener implements ApplicationListener, AndroidWallpaperListe
 		virtualWidthHalf = virtualWidth / 2;
 		virtualHeightHalf = virtualHeight / 2;
 
-		stage = new Stage(new ExtendViewport(virtualWidth, virtualHeight));
-		batch = stage.getBatch();
-
-		Gdx.gl.glViewport(0, 0, ScreenValues.SCREEN_WIDTH, ScreenValues.SCREEN_HEIGHT);
+		camera = new OrthographicCamera();
+		viewPort = new ExtendViewport(virtualWidth, virtualHeight, camera);
+		batch = new SpriteBatch();
+		stage = new Stage(viewPort, batch);
 		initScreenMode();
 
 		sprites = project.getSpriteList();
@@ -270,50 +273,12 @@ public class StageListener implements ApplicationListener, AndroidWallpaperListe
 		if (checkIfAutomaticScreenshotShouldBeTaken) {
 			makeAutomaticScreenshot = project.manualScreenshotExists(SCREENSHOT_MANUAL_FILE_NAME);
 		}
-
-		initializePostProcessEffects();
-
-		Log.d("LWP", "StageListener created!!!!!");
-	}
-
-	public void activatePostProcessingEffects(PostProcessingEffectAttributContainer effectAttributes)
-	{
-		if(postProcessorWrapper != null){
-			postProcessorWrapper.add(effectAttributes.getType(), effectAttributes);
-		}
-
-	}
-
-	public void deactivatePostProcessingEffects(PostProcessingEffectAttributContainer effectAttributes)
-	{
-		if(postProcessorWrapper != null) {
-			postProcessorWrapper.remove(effectAttributes.getType(), effectAttributes);
-		}
-	}
-
-	public void disableEffects()
-	{
-		if(postProcessorWrapper != null) {
-			postProcessorWrapper.removeAll();
-		}
-	}
-
-	public void initializePostProcessEffects()
-	{
-		ShaderLoader.BasePath = "data/shaders/";
-
-		if(postProcessorWrapper == null && isLWP){
-			PostProcessor postProcessor = new PostProcessor(false, true, false);
-			EffectsContainer effectsContainer = new EffectsContainer();
-			postProcessorWrapper = new PostProcessorWrapper(postProcessor, effectsContainer, isTest);
-		}
 	}
 
 	void activityResume() {
 		if (!paused) {
 			FaceDetectionHandler.resumeFaceDetection();
 		}
-
 	}
 
 	void activityPause() {
@@ -336,11 +301,15 @@ public class StageListener implements ApplicationListener, AndroidWallpaperListe
 		if (finished || reloadProject) {
 			return;
 		}
-		paused = true;
-		FaceDetectionHandler.pauseFaceDetection();
-		SoundManager.getInstance().pause();
-		for (Sprite sprite : sprites) {
-			sprite.pause();
+
+		try {
+			paused = true;
+			SoundManager.getInstance().pause();
+			for (Sprite sprite : sprites) {
+				sprite.pause();
+			}
+		} catch (Exception exception) {
+			Log.e(TAG, "Pausing menu failed!", exception);
 		}
 	}
 
@@ -360,9 +329,12 @@ public class StageListener implements ApplicationListener, AndroidWallpaperListe
 		}
 		this.stageDialog = stageDialog;
 
-		project.getUserVariables().resetAllUserVariables();
+		project.getDataContainer().resetAllDataObjects();
+
 		LedUtil.reset();
 		VibratorUtil.reset();
+
+		ProjectManager.getInstance().getCurrentProject().getDataContainer().resetAllDataObjects();
 
 		reloadProject = true;
 	}
@@ -395,9 +367,8 @@ public class StageListener implements ApplicationListener, AndroidWallpaperListe
 		}
 
 		for (Sprite sprite : sprites) {
-            sprite.look.refreshTextures();
+			sprite.look.refreshTextures();
 		}
-
 	}
 
 	@Override
@@ -519,7 +490,7 @@ public class StageListener implements ApplicationListener, AndroidWallpaperListe
 			 * Can be removed, when EMMA is replaced by an other code coverage tool, or when a
 			 * future EMMA - update will fix the bugs.
 			 */
-			if (DYNAMIC_SAMPLING_RATE_FOR_ACTIONS == false) {
+			if (!DYNAMIC_SAMPLING_RATE_FOR_ACTIONS) {
 				stage.act(deltaTime);
 			} else {
 				float optimizedDeltaTime = deltaTime / deltaActionTimeDivisor;
@@ -654,13 +625,14 @@ public class StageListener implements ApplicationListener, AndroidWallpaperListe
 		batch.draw(axes, -virtualWidthHalf, -AXIS_WIDTH / 2, virtualWidth, AXIS_WIDTH);
 		batch.draw(axes, -AXIS_WIDTH / 2, -virtualHeightHalf, AXIS_WIDTH, virtualHeight);
 
-		TextBounds bounds = font.getBounds(String.valueOf((int) virtualHeightHalf));
-		font.draw(batch, "-" + (int) virtualWidthHalf, -virtualWidthHalf + 3, -bounds.height / 2);
-		font.draw(batch, String.valueOf((int) virtualWidthHalf), virtualWidthHalf - bounds.width, -bounds.height / 2);
+		GlyphLayout layout = new GlyphLayout();
+		layout.setText(font, String.valueOf((int) virtualHeightHalf));
+		font.draw(batch, "-" + (int) virtualWidthHalf, -virtualWidthHalf + 3, -layout.height / 2);
+		font.draw(batch, String.valueOf((int) virtualWidthHalf), virtualWidthHalf - layout.width, -layout.height / 2);
 
-		font.draw(batch, "-" + (int) virtualHeightHalf, bounds.height / 2, -virtualHeightHalf + bounds.height + 3);
-		font.draw(batch, String.valueOf((int) virtualHeightHalf), bounds.height / 2, virtualHeightHalf - 3);
-		font.draw(batch, "0", bounds.height / 2, -bounds.height / 2);
+		font.draw(batch, "-" + (int) virtualHeightHalf, layout.height / 2, -virtualHeightHalf + layout.height + 3);
+		font.draw(batch, String.valueOf((int) virtualHeightHalf), layout.height / 2, virtualHeightHalf - 3);
+		font.draw(batch, "0", layout.height / 2, -layout.height / 2);
 		batch.end();
 	}
 
@@ -673,7 +645,7 @@ public class StageListener implements ApplicationListener, AndroidWallpaperListe
 		if (!finished) {
 			this.finish();
 		}
-		stage.dispose();
+		disposeStageButKeepActors();
 		font.dispose();
 		axes.dispose();
 		disposeTextures();
@@ -768,28 +740,25 @@ public class StageListener implements ApplicationListener, AndroidWallpaperListe
 	private void initScreenMode() {
 		switch (project.getScreenMode()) {
 			case STRETCH:
-				stage.setViewport(new StretchViewport(virtualWidth, virtualHeight));
-				stage.getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
 				screenshotWidth = ScreenValues.SCREEN_WIDTH;
 				screenshotHeight = ScreenValues.SCREEN_HEIGHT;
 				screenshotX = 0;
 				screenshotY = 0;
+				viewPort = new ScalingViewport(Scaling.stretch, virtualWidth, virtualHeight, camera);
 				break;
 
 			case MAXIMIZE:
-				stage.setViewport(new ExtendViewport(virtualWidth, virtualHeight));
-				stage.getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
 				screenshotWidth = maximizeViewPortWidth;
 				screenshotHeight = maximizeViewPortHeight;
 				screenshotX = maximizeViewPortX;
 				screenshotY = maximizeViewPortY;
+				viewPort = new ExtendViewport(virtualWidth, virtualHeight, camera);
 				break;
 
 			default:
 				break;
-
 		}
-		camera = (OrthographicCamera) stage.getCamera();
+		viewPort.update(ScreenValues.SCREEN_WIDTH, ScreenValues.SCREEN_HEIGHT, false);
 		camera.position.set(0, 0, 0);
 		camera.update();
 	}
@@ -818,27 +787,8 @@ public class StageListener implements ApplicationListener, AndroidWallpaperListe
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see com.badlogic.gdx.backends.android.AndroidWallpaperListener#offsetChange(float, float, float, float, int,
-	 * int)
-	 */
-	@Override
-	public void offsetChange(float xOffset, float yOffset, float xOffsetStep, float yOffsetStep, int xPixelOffset,
-			int yPixelOffset) {
-		// TODO Auto-generated method stub
-
-	}
-
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see com.badlogic.gdx.backends.android.AndroidWallpaperListener#previewStateChange(boolean)
-	 */
-	@Override
-	public void previewStateChange(boolean isPreview) {
-		this.isPreview = isPreview;
-		Log.d("LWP", "StageListener previewState changed(" + isPreview + ")");
+	private void disposeStageButKeepActors() {
+		stage.unfocusAll();
+		batch.dispose();
 	}
 }

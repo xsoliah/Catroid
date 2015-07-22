@@ -1,6 +1,6 @@
 /*
  * Catroid: An on-device visual programming system for Android devices
- * Copyright (C) 2010-2014 The Catrobat Team
+ * Copyright (C) 2010-2015 The Catrobat Team
  * (<http://developer.catrobat.org/credits>)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -366,7 +366,6 @@ public class DragAndDropListView extends ListView implements OnLongClickListener
 				touchPointY = location[1] + (getChildAt(getChildCount() - 1)).getHeight();
 			}
 			newView = false;
-
 		} else {
 			itemPosition = pointToPosition(view.getLeft(), view.getTop());
 			int visiblePosition = itemPosition - getFirstVisiblePosition();
@@ -451,5 +450,4 @@ public class DragAndDropListView extends ListView implements OnLongClickListener
 	public void setIsScrolling() {
 		isScrolling = true;
 	}
-
 }

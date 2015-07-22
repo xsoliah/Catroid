@@ -1,6 +1,6 @@
 /*
  * Catroid: An on-device visual programming system for Android devices
- * Copyright (C) 2010-2014 The Catrobat Team
+ * Copyright (C) 2010-2015 The Catrobat Team
  * (<http://developer.catrobat.org/credits>)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -70,12 +70,10 @@ public abstract class Script implements Serializable {
 						.copyFormulasMatchingNames(original.getUserBrickParameters(), copiedUserBrick.getUserBrickParameters());
 
 				copiedBrick = precopiedRootBrick;
-			}
-			else if (brick instanceof UserScriptDefinitionBrick) {
-					UserScriptDefinitionBrick preCopiedDefinitionBrick = findBrickWithId(preCopiedUserBricks,((UserScriptDefinitionBrick) brick).getUserBrickId()).getDefinitionBrick();
-					cloneScript.addBrick(preCopiedDefinitionBrick);
-			}
-			else {
+			} else if (brick instanceof UserScriptDefinitionBrick) {
+				UserScriptDefinitionBrick preCopiedDefinitionBrick = findBrickWithId(preCopiedUserBricks, ((UserScriptDefinitionBrick) brick).getUserBrickId()).getDefinitionBrick();
+				cloneScript.addBrick(preCopiedDefinitionBrick);
+			} else {
 				copiedBrick = brick.copyBrickForSprite(copySprite);
 			}
 
@@ -176,9 +174,7 @@ public abstract class Script implements Serializable {
 		int resources = Brick.NO_RESOURCES;
 
 		for (Brick brick : brickList) {
-			if (brick instanceof UserBrick) {
-				resources |= brick.getRequiredResources();
-			}
+			resources |= brick.getRequiredResources();
 		}
 		return resources;
 	}

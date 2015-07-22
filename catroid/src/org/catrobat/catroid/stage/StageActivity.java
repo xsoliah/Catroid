@@ -1,6 +1,6 @@
 /*
  * Catroid: An on-device visual programming system for Android devices
- * Copyright (C) 2010-2014 The Catrobat Team
+ * Copyright (C) 2010-2015 The Catrobat Team
  * (<http://developer.catrobat.org/credits>)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -26,19 +26,24 @@ import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.WindowManager;
-import android.widget.Toast;
 
+import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.backends.android.AndroidApplication;
+import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 
 import org.catrobat.catroid.ProjectHandler;
 import org.catrobat.catroid.ProjectManager;
 import org.catrobat.catroid.R;
+import org.catrobat.catroid.common.CatroidService;
 import org.catrobat.catroid.common.ScreenValues;
+import org.catrobat.catroid.common.ServiceProvider;
 import org.catrobat.catroid.drone.DroneInitializer;
+import org.catrobat.catroid.facedetection.FaceDetectionHandler;
 import org.catrobat.catroid.formulaeditor.SensorHandler;
 import org.catrobat.catroid.io.StageAudioFocus;
 import org.catrobat.catroid.ui.dialogs.StageDialog;
 import org.catrobat.catroid.utils.LedUtil;
+import org.catrobat.catroid.utils.ToastUtil;
 import org.catrobat.catroid.utils.VibratorUtil;
 
 public class StageActivity extends AndroidApplication {
@@ -66,16 +71,18 @@ public class StageActivity extends AndroidApplication {
 		stageDialog = new StageDialog(this, stageListener, R.style.stage_dialog);
 		calculateScreenSizes();
 
-		initialize(stageListener);
+		initialize(stageListener, new AndroidApplicationConfiguration());
 		if (droneConnection != null) {
 			try {
 				droneConnection.initialise();
 			} catch (RuntimeException runtimeException) {
 				Log.e(TAG, "Failure during drone service startup", runtimeException);
-				Toast.makeText(this, R.string.error_no_drone_connected, Toast.LENGTH_LONG).show();
+				ToastUtil.showError(this, R.string.error_no_drone_connected);
 				this.finish();
 			}
 		}
+
+		ServiceProvider.getService(CatroidService.BLUETOOTH_DEVICE_SERVICE).initialise();
 
 		stageAudioFocus = new StageAudioFocus(this);
 		ProjectHandler.getInstance().setPocketCodeStageActivity(this);
@@ -106,6 +113,8 @@ public class StageActivity extends AndroidApplication {
 		if (droneConnection != null) {
 			droneConnection.pause();
 		}
+
+		ServiceProvider.getService(CatroidService.BLUETOOTH_DEVICE_SERVICE).pause();
 	}
 
 	@Override
@@ -120,6 +129,8 @@ public class StageActivity extends AndroidApplication {
 		if (droneConnection != null) {
 			droneConnection.start();
 		}
+
+		ServiceProvider.getService(CatroidService.BLUETOOTH_DEVICE_SERVICE).start();
 	}
 
 	public void pause() {
@@ -127,6 +138,9 @@ public class StageActivity extends AndroidApplication {
 		stageListener.menuPause();
 		LedUtil.pauseLed();
 		VibratorUtil.pauseVibrator();
+		FaceDetectionHandler.pauseFaceDetection();
+
+		ServiceProvider.getService(CatroidService.BLUETOOTH_DEVICE_SERVICE).pause();
 	}
 
 	public void resume() {
@@ -134,6 +148,9 @@ public class StageActivity extends AndroidApplication {
 		LedUtil.resumeLed();
 		VibratorUtil.resumeVibrator();
 		SensorHandler.startSensorListener(this);
+		FaceDetectionHandler.startFaceDetection(this);
+
+		ServiceProvider.getService(CatroidService.BLUETOOTH_DEVICE_SERVICE).start();
 	}
 
 	public boolean getResizePossible() {
@@ -166,7 +183,6 @@ public class StageActivity extends AndroidApplication {
 			stageListener.maximizeViewPortWidth = (int) (ScreenValues.SCREEN_WIDTH * scale);
 			stageListener.maximizeViewPortX = (int) ((ScreenValues.SCREEN_WIDTH - stageListener.maximizeViewPortWidth) / 2f);
 			stageListener.maximizeViewPortHeight = ScreenValues.SCREEN_HEIGHT;
-
 		} else if (aspectRatio > screenAspectRatio) {
 			scale = ratioWidth / ratioHeight;
 			stageListener.maximizeViewPortHeight = (int) (ScreenValues.SCREEN_HEIGHT * scale);
@@ -188,10 +204,27 @@ public class StageActivity extends AndroidApplication {
 		if (droneConnection != null) {
 			droneConnection.destroy();
 		}
+
+		ServiceProvider.getService(CatroidService.BLUETOOTH_DEVICE_SERVICE).destroy();
+
 		Log.d(TAG, "Destroy");
 		LedUtil.destroy();
 		VibratorUtil.destroy();
 		super.onDestroy();
 	}
 
+	@Override
+	public ApplicationListener getApplicationListener() {
+		return stageListener;
+	}
+
+	@Override
+	public void log(String tag, String message, Throwable exception) {
+		Log.d(tag, message, exception);
+	}
+
+	@Override
+	public int getLogLevel() {
+		return 0;
+	}
 }

@@ -1,6 +1,6 @@
 /*
  * Catroid: An on-device visual programming system for Android devices
- * Copyright (C) 2010-2014 The Catrobat Team
+ * Copyright (C) 2010-2015 The Catrobat Team
  * (<http://developer.catrobat.org/credits>)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -135,7 +135,7 @@ public class IfBrickTest extends BaseActivityInstrumentationTestCase<MainMenuAct
 
 		assertEquals("Incorrect number of bricks.", 4, projectBrickList.size());
 		assertTrue("Wrong Brick instance - expected IfElseBrick but was "
-				+ projectBrickList.get(1).getClass().getSimpleName(),
+						+ projectBrickList.get(1).getClass().getSimpleName(),
 				projectBrickList.get(1) instanceof IfLogicElseBrick);
 
 		assertTrue("Wrong Brick instance - expected ChangeYByNBrick but was "
@@ -158,7 +158,7 @@ public class IfBrickTest extends BaseActivityInstrumentationTestCase<MainMenuAct
 		logBrickListForJenkins(projectBrickList);
 
 		assertTrue("Wrong Brick instance, expected IfLogicEndBrick but was "
-				+ projectBrickList.get(2).getClass().getSimpleName(),
+						+ projectBrickList.get(2).getClass().getSimpleName(),
 				projectBrickList.get(2) instanceof IfLogicEndBrick);
 
 		UiTestUtils.addNewBrick(solo, R.string.brick_broadcast_receive);

@@ -1,6 +1,6 @@
 /*
  * Catroid: An on-device visual programming system for Android devices
- * Copyright (C) 2010-2014 The Catrobat Team
+ * Copyright (C) 2010-2015 The Catrobat Team
  * (<http://developer.catrobat.org/credits>)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -42,7 +42,6 @@ public class StopAllSoundsBrick extends BrickBaseType {
 	private static final long serialVersionUID = 1L;
 
 	public StopAllSoundsBrick() {
-
 	}
 
 	@Override
@@ -88,7 +87,6 @@ public class StopAllSoundsBrick extends BrickBaseType {
 
 			TextView textStop = (TextView) view.findViewById(R.id.brick_stop_all_sounds_label);
 			textStop.setTextColor(textStop.getTextColors().withAlpha(alphaValue));
-
 		}
 
 		return view;
@@ -109,5 +107,4 @@ public class StopAllSoundsBrick extends BrickBaseType {
 		sequence.addAction(ExtendedActions.stopAllSounds());
 		return null;
 	}
-
 }

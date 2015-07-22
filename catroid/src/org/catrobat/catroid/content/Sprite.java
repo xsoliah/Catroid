@@ -1,6 +1,6 @@
 /*
  * Catroid: An on-device visual programming system for Android devices
- * Copyright (C) 2010-2014 The Catrobat Team
+ * Copyright (C) 2010-2015 The Catrobat Team
  * (<http://developer.catrobat.org/credits>)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -39,8 +39,8 @@ import org.catrobat.catroid.content.actions.ExtendedActions;
 import org.catrobat.catroid.content.bricks.Brick;
 import org.catrobat.catroid.content.bricks.UserBrick;
 import org.catrobat.catroid.content.bricks.UserScriptDefinitionBrick;
+import org.catrobat.catroid.formulaeditor.DataContainer;
 import org.catrobat.catroid.formulaeditor.UserVariable;
-import org.catrobat.catroid.formulaeditor.UserVariablesContainer;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -71,7 +71,6 @@ public class Sprite implements Serializable, Cloneable {
 	}
 
 	public Sprite() {
-
 	}
 
 	private Object readResolve() {
@@ -107,6 +106,10 @@ public class Sprite implements Serializable, Cloneable {
 		if (userBricks == null) {
 			userBricks = new ArrayList<UserBrick>();
 		}
+	}
+
+	public List<Script> getScriptList() {
+		return scriptList;
 	}
 
 	public void resetSprite() {
@@ -210,7 +213,7 @@ public class Sprite implements Serializable, Cloneable {
 		if (currentProject == null || !currentProject.getSpriteList().contains(this)) {
 			throw new RuntimeException("The sprite must be in the current project before cloning it.");
 		}
-		UserVariablesContainer userVariables = currentProject.getUserVariables();
+		DataContainer userVariables = currentProject.getDataContainer();
 		List<UserVariable> originalSpriteVariables = userVariables.getOrCreateVariableListForSprite(this);
 		List<UserVariable> clonedSpriteVariables = userVariables.getOrCreateVariableListForSprite(cloneSprite);
 		for (UserVariable variable : originalSpriteVariables) {
@@ -285,7 +288,6 @@ public class Sprite implements Serializable, Cloneable {
 		}
 
 		return cloneSprite;
-
 	}
 
 	protected UserBrick findBrickWithId(List<UserBrick> list, int id) {
@@ -303,7 +305,6 @@ public class Sprite implements Serializable, Cloneable {
 			if (s instanceof WhenScript && (((WhenScript) s).getAction().equalsIgnoreCase(action))) {
 				SequenceAction sequence = createActionSequence(s);
 				whenParallelAction.addAction(sequence);
-
 			}
 		}
 		look.setWhenParallelAction(whenParallelAction);
@@ -341,7 +342,6 @@ public class Sprite implements Serializable, Cloneable {
 	public void addScript(Script script) {
 		if (script != null && !scriptList.contains(script)) {
 			scriptList.add(script);
-
 		}
 	}
 
@@ -353,6 +353,7 @@ public class Sprite implements Serializable, Cloneable {
 
 	public Script getScript(int index) {
 		if (index < 0 || index >= scriptList.size()) {
+			Log.e(TAG, "getScript() Index out of Scope! scriptList size: " + scriptList.size());
 			return null;
 		}
 		return scriptList.get(index);

@@ -1,6 +1,6 @@
 /*
  * Catroid: An on-device visual programming system for Android devices
- * Copyright (C) 2010-2014 The Catrobat Team
+ * Copyright (C) 2010-2015 The Catrobat Team
  * (<http://developer.catrobat.org/credits>)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -48,8 +48,8 @@ import org.catrobat.catroid.R;
 import org.catrobat.catroid.content.Sprite;
 import org.catrobat.catroid.content.bricks.UserScriptDefinitionBrick;
 import org.catrobat.catroid.content.bricks.UserScriptDefinitionBrickElement;
+import org.catrobat.catroid.formulaeditor.DataContainer;
 import org.catrobat.catroid.formulaeditor.UserVariable;
-import org.catrobat.catroid.formulaeditor.UserVariablesContainer;
 import org.catrobat.catroid.ui.BottomBar;
 import org.catrobat.catroid.ui.BrickLayout;
 import org.catrobat.catroid.ui.DragAndDropBrickLayoutListener;
@@ -109,7 +109,6 @@ public class UserBrickDataEditorFragment extends SherlockFragment implements OnK
 			fragTransaction.hide(fragmentManager.findFragmentByTag(ScriptFragment.TAG));
 			fragTransaction.show(dataEditorFragment);
 			BottomBar.hideBottomBar(activity);
-
 		} else if (dataEditorFragment.isHidden()) {
 			dataEditorFragment.updateBrickView();
 			fragTransaction.hide(fragmentManager.findFragmentByTag(ScriptFragment.TAG));
@@ -176,7 +175,6 @@ public class UserBrickDataEditorFragment extends SherlockFragment implements OnK
 				if (action.equals(resources.getString(R.string.close))) {
 					onUserDismiss();
 				}
-
 			}
 		});
 
@@ -203,7 +201,7 @@ public class UserBrickDataEditorFragment extends SherlockFragment implements OnK
 	}
 
 	public void editElementDialog(int id, CharSequence text, boolean editMode, int title, int defaultText) {
-		UserVariablesContainer variablesContainer = ProjectManager.getInstance().getCurrentProject().getUserVariables();
+		DataContainer variablesContainer = ProjectManager.getInstance().getCurrentProject().getDataContainer();
 		Sprite currentSprite = ProjectManager.getInstance().getCurrentSprite();
 		List<UserVariable> spriteVars = variablesContainer.getOrCreateVariableListForSprite(currentSprite);
 		List<UserVariable> globalVars = variablesContainer.getProjectVariables();
@@ -368,5 +366,4 @@ public class UserBrickDataEditorFragment extends SherlockFragment implements OnK
 	public void decreaseIndexOfCurrentlyEditedElement() {
 		indexOfCurrentlyEditedElement--;
 	}
-
 }

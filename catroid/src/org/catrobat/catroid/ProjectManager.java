@@ -1,6 +1,6 @@
 /*
  * Catroid: An on-device visual programming system for Android devices
- * Copyright (C) 2010-2014 The Catrobat Team
+ * Copyright (C) 2010-2015 The Catrobat Team
  * (<http://developer.catrobat.org/credits>)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -43,6 +43,7 @@ import org.catrobat.catroid.content.bricks.IfLogicElseBrick;
 import org.catrobat.catroid.content.bricks.IfLogicEndBrick;
 import org.catrobat.catroid.content.bricks.LoopBeginBrick;
 import org.catrobat.catroid.content.bricks.LoopEndBrick;
+import org.catrobat.catroid.content.bricks.PhiroIfLogicBeginBrick;
 import org.catrobat.catroid.content.bricks.UserBrick;
 import org.catrobat.catroid.exceptions.CompatibilityProjectException;
 import org.catrobat.catroid.exceptions.LoadingProjectException;
@@ -133,8 +134,13 @@ public final class ProjectManager implements OnLoadProjectCompleteListener, OnCh
 			}
 			throw new LoadingProjectException(context.getString(R.string.error_load_project));
 		} else if (project.getCatrobatLanguageVersion() > Constants.CURRENT_CATROBAT_LANGUAGE_VERSION) {
-			project = oldProject;
-			throw new OutdatedVersionProjectException(context.getString(R.string.error_outdated_pocketcode_version));
+			if (project.getCatrobatLanguageVersion() == 0.93f) {
+				// this was done because of insufficient error message in older program versions
+				project.setCatrobatLanguageVersion(0.92f);
+			} else {
+				project = oldProject;
+				throw new OutdatedVersionProjectException(context.getString(R.string.error_outdated_pocketcode_version));
+			}
 		} else {
 			if (project.getCatrobatLanguageVersion() == 0.8f) {
 				//TODO insert in every "When project starts" script list a "show" brick
@@ -149,11 +155,16 @@ public final class ProjectManager implements OnLoadProjectCompleteListener, OnCh
 				project.setScreenMode(ScreenModes.STRETCH);
 				checkNestingBrickReferences(false);
 			}
-			if (project.getCatrobatLanguageVersion() == 0.92f) {
-				project.setCatrobatLanguageVersion(0.93f);
-			}
 
-			//insert further conversions here
+			if (project.getCatrobatLanguageVersion() == 0.92f || project.getCatrobatLanguageVersion() == 0.93f) {
+				//0.93 should be left out because it available unintentional for a day
+				//raise language version here to 0.94
+				project.setCatrobatLanguageVersion(0.94f);
+			}
+			if (project.getCatrobatLanguageVersion() == 0.94f) {
+				project.setCatrobatLanguageVersion(Constants.CURRENT_CATROBAT_LANGUAGE_VERSION);
+			}
+//			insert further conversions here
 
 			checkNestingBrickReferences(true);
 			if (project.getCatrobatLanguageVersion() == Constants.CURRENT_CATROBAT_LANGUAGE_VERSION) {
@@ -167,7 +178,9 @@ public final class ProjectManager implements OnLoadProjectCompleteListener, OnCh
 		}
 		Project newProject = project;
 
-		return newProject;
+		if (project != null) {
+			project.loadLegoNXTSettingsFromProject(context);
+		}
 	}
 
 	private void localizeBackgroundSprite(Context context) {
@@ -190,7 +203,7 @@ public final class ProjectManager implements OnLoadProjectCompleteListener, OnCh
 		return StorageHandler.getInstance().loadProject(projectName) != null;
 	}
 
-	public void saveProject() {
+	public void saveProject(Context context) {
 		if (project == null) {
 
 			return;
@@ -203,6 +216,8 @@ public final class ProjectManager implements OnLoadProjectCompleteListener, OnCh
 		if (project == null) {
 			return;
 		}
+
+		project.saveLegoNXTSettingsToProject(context);
 
 		if (asynchronTask) {
 			SaveProjectAsynchronousTask saveTask = new SaveProjectAsynchronousTask();
@@ -268,11 +283,10 @@ public final class ProjectManager implements OnLoadProjectCompleteListener, OnCh
 		this.project = project;
 	}
 
-	@Deprecated
+	//@Deprecated
 	public void deleteCurrentProject(Context context) throws IllegalArgumentException, IOException {
 		deleteProject(project.getName(), context);
 	}
-
 
 	public void deleteProject(String projectName, Context context) throws IllegalArgumentException, IOException {
 		Log.d(TAG, "deleteProject " + projectName);
@@ -322,7 +336,7 @@ public final class ProjectManager implements OnLoadProjectCompleteListener, OnCh
 
 		if (directoryRenamed) {
 			project.setName(newProjectName);
-			saveWithoutLock();
+			saveProject(context);
 		}
 
 		if (!directoryRenamed) {
@@ -437,12 +451,10 @@ public final class ProjectManager implements OnLoadProjectCompleteListener, OnCh
 
 	@Override
 	public void onLoadProjectSuccess(boolean startProjectActivity) {
-
 	}
 
 	@Override
 	public void onLoadProjectFailure() {
-
 	}
 
 	public void checkNestingBrickReferences(boolean assumeWrong) {
@@ -499,6 +511,7 @@ public final class ProjectManager implements OnLoadProjectCompleteListener, OnCh
 
 	private void correctAllNestedReferences(Script script) {
 		ArrayList<IfLogicBeginBrick> ifBeginList = new ArrayList<IfLogicBeginBrick>();
+		ArrayList<PhiroIfLogicBeginBrick> ifSensorBeginList = new ArrayList<PhiroIfLogicBeginBrick>();
 		ArrayList<LoopBeginBrick> loopBeginList = new ArrayList<LoopBeginBrick>();
 		for (Brick currentBrick : script.getBrickList()) {
 			if (currentBrick instanceof IfLogicBeginBrick) {
@@ -522,6 +535,20 @@ public final class ProjectManager implements OnLoadProjectCompleteListener, OnCh
 				((IfLogicEndBrick) currentBrick).setIfBeginBrick(ifBeginBrick);
 				((IfLogicEndBrick) currentBrick).setIfElseBrick(elseBrick);
 				ifBeginList.remove(ifBeginBrick);
+			} else if (currentBrick instanceof PhiroIfLogicBeginBrick) {
+				ifSensorBeginList.add((PhiroIfLogicBeginBrick) currentBrick);
+			} else if (currentBrick instanceof IfLogicElseBrick) {
+				PhiroIfLogicBeginBrick phiroSensorBrick = ifSensorBeginList.get(ifSensorBeginList.size() - 1);
+				phiroSensorBrick.setIfElseBrick((IfLogicElseBrick) currentBrick);
+				((IfLogicElseBrick) currentBrick).setIfBeginBrick(phiroSensorBrick);
+			} else if (currentBrick instanceof IfLogicEndBrick) {
+				PhiroIfLogicBeginBrick phiroSensorBrick = ifSensorBeginList.get(ifSensorBeginList.size() - 1);
+				IfLogicElseBrick elseBrick = phiroSensorBrick.getIfElseBrick();
+				phiroSensorBrick.setIfEndBrick((IfLogicEndBrick) currentBrick);
+				elseBrick.setIfEndBrick((IfLogicEndBrick) currentBrick);
+				((IfLogicEndBrick) currentBrick).setIfBeginBrick(phiroSensorBrick);
+				((IfLogicEndBrick) currentBrick).setIfElseBrick(elseBrick);
+				ifSensorBeginList.remove(phiroSensorBrick);
 			}
 		}
 	}

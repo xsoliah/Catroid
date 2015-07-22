@@ -1,6 +1,6 @@
 /*
  * Catroid: An on-device visual programming system for Android devices
- * Copyright (C) 2010-2014 The Catrobat Team
+ * Copyright (C) 2010-2015 The Catrobat Team
  * (<http://developer.catrobat.org/credits>)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -55,7 +55,6 @@ public class InternFormulaState {
 				InternToken token = internTokenFormulaList.get(index);
 				result = prime * result + token.getInternTokenType().hashCode();
 				result = prime * result + token.getTokenStringValue().hashCode();
-
 			}
 		}
 		return result;
@@ -69,7 +68,7 @@ public class InternFormulaState {
 			if (externCursorPosition != stateToCompare.externCursorPosition
 					|| (tokenSelection == null && stateToCompare.tokenSelection != null)
 					|| (tokenSelection != null && !tokenSelection.equals(stateToCompare.tokenSelection) || (internTokenFormulaList
-							.size() != stateToCompare.internTokenFormulaList.size()))) {
+					.size() != stateToCompare.internTokenFormulaList.size()))) {
 				return false;
 			}
 
@@ -81,7 +80,6 @@ public class InternFormulaState {
 						|| !original.getTokenStringValue().equals(internTokenToCompare.getTokenStringValue())) {
 					return false;
 				}
-
 			}
 
 			return true;
@@ -92,7 +90,6 @@ public class InternFormulaState {
 
 	public void setSelection(InternFormulaTokenSelection internFormulaTokenSelection) {
 		this.tokenSelection = internFormulaTokenSelection;
-
 	}
 
 	public void setExternCursorPosition(int externCursorPosition) {
@@ -114,5 +111,4 @@ public class InternFormulaState {
 		return new InternFormula(deepCopyOfInternTokenFormula, deepCopyOfInternFormulaTokenSelection,
 				externCursorPosition);
 	}
-
 }

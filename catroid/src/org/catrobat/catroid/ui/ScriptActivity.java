@@ -1,6 +1,6 @@
 /*
  * Catroid: An on-device visual programming system for Android devices
- * Copyright (C) 2010-2014 The Catrobat Team
+ * Copyright (C) 2010-2015 The Catrobat Team
  * (<http://developer.catrobat.org/credits>)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -28,6 +28,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -47,9 +48,9 @@ import org.catrobat.catroid.stage.StageActivity;
 import org.catrobat.catroid.ui.adapter.BrickAdapter;
 import org.catrobat.catroid.ui.adapter.ScriptActivityAdapterInterface;
 import org.catrobat.catroid.ui.dragndrop.DragAndDropListView;
+import org.catrobat.catroid.ui.fragment.FormulaEditorDataFragment;
 import org.catrobat.catroid.ui.fragment.FormulaEditorFragment;
 import org.catrobat.catroid.ui.fragment.FormulaEditorListFragment;
-import org.catrobat.catroid.ui.fragment.FormulaEditorVariableListFragment;
 import org.catrobat.catroid.ui.fragment.LookFragment;
 import org.catrobat.catroid.ui.fragment.ScriptActivityFragment;
 import org.catrobat.catroid.ui.fragment.ScriptFragment;
@@ -77,6 +78,9 @@ public class ScriptActivity extends BaseActivity {
 	public static final String ACTION_SOUND_RENAMED = "org.catrobat.catroid.SOUND_RENAMED";
 	public static final String ACTION_SOUNDS_LIST_INIT = "org.catrobat.catroid.SOUNDS_LIST_INIT";
 	public static final String ACTION_VARIABLE_DELETED = "org.catrobat.catroid.VARIABLE_DELETED";
+	public static final String ACTION_USERLIST_DELETED = "org.catrobat.catroid.USERLIST_DELETED";
+
+	private static final String TAG = ScriptActivity.class.getSimpleName();
 	private static int currentFragmentPosition;
 	private FragmentManager fragmentManager = getSupportFragmentManager();
 	private ScriptFragment scriptFragment = null;
@@ -127,14 +131,19 @@ public class ScriptActivity extends BaseActivity {
 		BottomBar.showAddButton(this);
 		BottomBar.showPlayButton(this);
 		updateHandleAddButtonClickListener();
-
 	}
 
 	public void setupActionBar() {
 		final ActionBar actionBar = getSupportActionBar();
 		actionBar.setHomeButtonEnabled(true);
 		actionBar.setDisplayShowTitleEnabled(true);
-		String currentSprite = ProjectManager.getInstance().getCurrentSprite().getName();
+		String currentSprite = null;
+		try {
+			currentSprite = ProjectManager.getInstance().getCurrentSprite().getName();
+		} catch (NullPointerException nullPointerException) {
+			Log.e(TAG, Log.getStackTraceString(nullPointerException));
+			finish();
+		}
 		actionBar.setTitle(currentSprite);
 	}
 
@@ -225,10 +234,10 @@ public class ScriptActivity extends BaseActivity {
 			return super.onOptionsItemSelected(item);
 		}
 
-		FormulaEditorVariableListFragment formulaEditorVariableListFragment = (FormulaEditorVariableListFragment) getSupportFragmentManager()
-				.findFragmentByTag(FormulaEditorVariableListFragment.VARIABLE_TAG);
+		FormulaEditorDataFragment formulaEditorDataFragment = (FormulaEditorDataFragment) getSupportFragmentManager()
+				.findFragmentByTag(FormulaEditorDataFragment.USER_DATA_TAG);
 
-		if (formulaEditorVariableListFragment != null && formulaEditorVariableListFragment.isVisible()) {
+		if (formulaEditorDataFragment != null && formulaEditorDataFragment.isVisible()) {
 			return super.onOptionsItemSelected(item);
 		}
 
@@ -299,20 +308,19 @@ public class ScriptActivity extends BaseActivity {
 			if (fragment != null && fragment.isVisible()) {
 				return fragment.onKey(null, keyCode, event);
 			}
-
 		}
 
 		String tag1 = UserBrickDataEditorFragment.BRICK_DATA_EDITOR_FRAGMENT_TAG;
 		UserBrickDataEditorFragment fragment = (UserBrickDataEditorFragment) fragmentManager.findFragmentByTag(tag1);
 		if (fragment != null && fragment.isVisible()) {
-				return fragment.onKey(null, keyCode, event);
+			return fragment.onKey(null, keyCode, event);
 		}
 
-		FormulaEditorVariableListFragment formulaEditorVariableListFragment = (FormulaEditorVariableListFragment) getSupportFragmentManager()
-				.findFragmentByTag(FormulaEditorVariableListFragment.VARIABLE_TAG);
+		FormulaEditorDataFragment formulaEditorDataFragment = (FormulaEditorDataFragment) getSupportFragmentManager()
+				.findFragmentByTag(FormulaEditorDataFragment.USER_DATA_TAG);
 
-		if (formulaEditorVariableListFragment != null && formulaEditorVariableListFragment.isVisible()) {
-			return formulaEditorVariableListFragment.onKey(null, keyCode, event);
+		if (formulaEditorDataFragment != null && formulaEditorDataFragment.isVisible()) {
+			return formulaEditorDataFragment.onKey(null, keyCode, event);
 		}
 
 		FormulaEditorFragment formulaEditor = (FormulaEditorFragment) getSupportFragmentManager().findFragmentByTag(
@@ -322,7 +330,6 @@ public class ScriptActivity extends BaseActivity {
 			scriptFragment.getAdapter().updateProjectBrickList();
 			return formulaEditor.onKey(null, keyCode, event);
 		}
-
 		if (soundFragment != null && soundFragment.isVisible() && soundFragment.onKey(null, keyCode, event)) {
 			return true;
 		}
@@ -362,13 +369,11 @@ public class ScriptActivity extends BaseActivity {
 		if (hasFocus) {
 			if (soundFragment != null && soundFragment.isVisible()) {
 				sendBroadcast(new Intent(ScriptActivity.ACTION_SOUNDS_LIST_INIT));
-
 			}
 
 			if (lookFragment != null && lookFragment.isVisible()) {
 				sendBroadcast(new Intent(ScriptActivity.ACTION_LOOKS_LIST_INIT));
 			}
-
 		}
 	}
 
@@ -396,7 +401,7 @@ public class ScriptActivity extends BaseActivity {
 			if (!viewSwitchLock.tryLock()) {
 				return;
 			}
-			ProjectManager.getInstance().getCurrentProject().getUserVariables().resetAllUserVariables();
+			ProjectManager.getInstance().getCurrentProject().getDataContainer().resetAllDataObjects();
 			Intent intent = new Intent(this, PreStageActivity.class);
 			startActivityForResult(intent, PreStageActivity.REQUEST_RESOURCES_INIT);
 		}
@@ -406,11 +411,11 @@ public class ScriptActivity extends BaseActivity {
 	public boolean dispatchKeyEvent(KeyEvent event) {
 		//Dismiss ActionMode without effecting checked items
 
-		FormulaEditorVariableListFragment formulaEditorVariableListFragment = (FormulaEditorVariableListFragment) getSupportFragmentManager()
-				.findFragmentByTag(FormulaEditorVariableListFragment.VARIABLE_TAG);
+		FormulaEditorDataFragment formulaEditorDataFragment = (FormulaEditorDataFragment) getSupportFragmentManager()
+				.findFragmentByTag(FormulaEditorDataFragment.USER_DATA_TAG);
 
-		if (formulaEditorVariableListFragment != null && formulaEditorVariableListFragment.isVisible()) {
-			ListAdapter adapter = formulaEditorVariableListFragment.getListAdapter();
+		if (formulaEditorDataFragment != null && formulaEditorDataFragment.isVisible()) {
+			ListAdapter adapter = formulaEditorDataFragment.getListAdapter();
 			((ScriptActivityAdapterInterface) adapter).clearCheckedItems();
 			return super.dispatchKeyEvent(event);
 		}

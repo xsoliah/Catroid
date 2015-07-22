@@ -1,6 +1,6 @@
 /*
  * Catroid: An on-device visual programming system for Android devices
- * Copyright (C) 2010-2014 The Catrobat Team
+ * Copyright (C) 2010-2015 The Catrobat Team
  * (<http://developer.catrobat.org/credits>)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,13 +20,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-/**
- * Copyright for original "String buildPath" held by:
- * 	Copyright (C) 2008 Rob Manning
- * 	manningr@users.sourceforge.net
- * Source: http://www.java2s.com/Code/Java/File-Input-Output/Autilityclassformanipulatingpaths.htm
- */
-
 package org.catrobat.catroid.utils;
 
 import android.app.Activity;
@@ -126,7 +119,6 @@ public final class Utils {
 			//a null-context should never be passed. However, an educated guess is needed in that case.
 			ScreenValues.setToDefaultSreenSize();
 		}
-
 	}
 
 	public static boolean isNetworkAvailable(Context context) {
@@ -139,11 +131,9 @@ public final class Utils {
 
 	/**
 	 * Constructs a path out of the pathElements.
-	 * 
-	 * @param pathElements
-	 *            the strings to connect. They can have "/" in them which will be de-duped in the result, if necessary.
-	 * @return
-	 *         the path that was constructed.
+	 *
+	 * @param pathElements the strings to connect. They can have "/" in them which will be de-duped in the result, if necessary.
+	 * @return the path that was constructed.
 	 */
 	public static String buildPath(String... pathElements) {
 		StringBuilder result = new StringBuilder("/");
@@ -178,6 +168,19 @@ public final class Utils {
 		errorDialog.show();
 	}
 
+	public static void showErrorDialog(Context context, String msg, int errorTitleId) {
+		Builder builder = new CustomAlertDialogBuilder(context);
+		builder.setTitle(errorTitleId);
+		builder.setMessage(msg);
+		builder.setNeutralButton(R.string.close, new OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+			}
+		});
+		Dialog errorDialog = builder.create();
+		errorDialog.show();
+	}
+
 	public static View addSelectAllActionModeButton(LayoutInflater inflater, ActionMode mode, Menu menu) {
 		mode.getMenuInflater().inflate(R.menu.menu_actionmode, menu);
 		MenuItem item = menu.findItem(R.id.select_all);
@@ -195,9 +198,9 @@ public final class Utils {
 		if (!file.isFile()) {
 			Log.e(TAG, String.format("md5Checksum() Error with file %s isFile: %s isDirectory: %s exists: %s",
 					file.getName(),
-						Boolean.valueOf(file.isFile()),
-							Boolean.valueOf(file.isDirectory()),
-								Boolean.valueOf(file.exists())));
+					Boolean.valueOf(file.isFile()),
+					Boolean.valueOf(file.isDirectory()),
+					Boolean.valueOf(file.exists())));
 			return null;
 		}
 
@@ -306,7 +309,6 @@ public final class Utils {
 				Log.e(TAG, "Project cannot load", projectException);
 				ProjectManager.getInstance().initializeDefaultProject(context);
 			}
-
 		}
 		ProjectHandler.getInstance().setPocketCodeProject(newProject);
 
@@ -336,13 +338,15 @@ public final class Utils {
 
 	public static String getCurrentProjectName(Context context) {
 		if (ProjectManager.getInstance().getCurrentProject() == null) {
+
+			if (UtilFile.getProjectNames(new File(Constants.DEFAULT_ROOT)).size() == 0) {
+				Log.i("Utils", "Somebody deleted all projects in the file-system");
+				ProjectManager.getInstance().initializeDefaultProject(context);
+			}
+
 			SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 			String currentProjectName = sharedPreferences.getString(Constants.PREF_PROJECTNAME_KEY, null);
 			if (currentProjectName == null || !StorageHandler.getInstance().projectExists(currentProjectName)) {
-				List<String> projectNameList = UtilFile.getProjectNames(new File(Constants.DEFAULT_ROOT));
-				if (projectNameList.isEmpty()) {
-					ProjectManager.getInstance().initializeDefaultProject(context);
-				}
 				currentProjectName = UtilFile.getProjectNames(new File(Constants.DEFAULT_ROOT)).get(0);
 			}
 			return currentProjectName;
@@ -478,7 +482,7 @@ public final class Utils {
 			ProjectManager.getInstance().deleteCurrentProject(null);
 
 			ProjectManager.getInstance().setProject(projectToCheck);
-			ProjectManager.getInstance().saveProject();
+			ProjectManager.getInstance().saveProject(context);
 
 			String projectToCheckXMLString = StorageHandler.getInstance().getXMLStringOfAProject(projectToCheck);
 			start = projectToCheckXMLString.indexOf("<objectList>");
@@ -492,7 +496,6 @@ public final class Utils {
 			Log.e(TAG, Log.getStackTraceString(ioException));
 		}
 		return true;
-
 	}
 
 	public static int convertDoubleToPluralInteger(double value) {

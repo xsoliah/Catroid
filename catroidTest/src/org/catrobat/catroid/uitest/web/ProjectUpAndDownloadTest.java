@@ -1,6 +1,6 @@
 /*
  * Catroid: An on-device visual programming system for Android devices
- * Copyright (C) 2010-2014 The Catrobat Team
+ * Copyright (C) 2010-2015 The Catrobat Team
  * (<http://developer.catrobat.org/credits>)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -41,12 +41,12 @@ import org.catrobat.catroid.content.Sprite;
 import org.catrobat.catroid.content.bricks.WaitBrick;
 import org.catrobat.catroid.exceptions.ProjectException;
 import org.catrobat.catroid.io.StorageHandler;
+import org.catrobat.catroid.test.utils.Reflection;
 import org.catrobat.catroid.ui.MainMenuActivity;
 import org.catrobat.catroid.ui.ProgramMenuActivity;
 import org.catrobat.catroid.ui.ProjectActivity;
 import org.catrobat.catroid.uitest.annotation.Device;
 import org.catrobat.catroid.uitest.util.BaseActivityInstrumentationTestCase;
-import org.catrobat.catroid.uitest.util.Reflection;
 import org.catrobat.catroid.uitest.util.UiTestUtils;
 import org.catrobat.catroid.web.ServerCalls;
 import org.json.JSONException;
@@ -155,13 +155,7 @@ public class ProjectUpAndDownloadTest extends BaseActivityInstrumentationTestCas
 
 		boolean uploadErrorOccurred = solo.waitForText(solo.getString(R.string.error_project_upload));
 
-		int statusCode = 0;
-		int statusCodeWrongLanguageVersion = 518;
-		statusCode = (Integer) Reflection.getPrivateField(ServerCalls.getInstance(), "uploadStatusCode");
-		Log.v("statusCode=", "" + statusCode);
-
 		assertTrue("Upload did work, but error toastmessage should have been displayed", uploadErrorOccurred);
-		assertEquals("Wrong status code from Web", statusCodeWrongLanguageVersion, statusCode);
 		UiTestUtils.clearAllUtilTestProjects();
 	}
 
@@ -193,14 +187,7 @@ public class ProjectUpAndDownloadTest extends BaseActivityInstrumentationTestCas
 
 		boolean uploadErrorOccurred = solo.waitForText(solo.getString(R.string.error_project_upload));
 
-		int statusCode = 0;
-		int statusCodeOffensiveLanguage = 511;
-		statusCode = (Integer) Reflection.getPrivateField(ServerCalls.getInstance(), "uploadStatusCode");
-		Log.v("statusCode=", "" + statusCode);
-
 		assertTrue("Upload did work, but error toastmessage should have been displayed", uploadErrorOccurred);
-		assertEquals("Wrong status code from Web should be 511 for offensive language", statusCodeOffensiveLanguage,
-				statusCode);
 		UiTestUtils.clearAllUtilTestProjects();
 	}
 
@@ -385,7 +372,6 @@ public class ProjectUpAndDownloadTest extends BaseActivityInstrumentationTestCas
 
 		assertTrue("Upload of unmodified standard project should not be possible, but succeeded",
 				solo.searchText(solo.getString(R.string.error_upload_default_project)));
-
 	}
 
 	@Device
@@ -422,7 +408,7 @@ public class ProjectUpAndDownloadTest extends BaseActivityInstrumentationTestCas
 		solo.clickOnButton(uploadButtonText);
 
 		assertTrue("Upload of the modified standard project should be possible, but did not succeed",
-				solo.waitForText(solo.getString(R.string.notification_upload_finished), 0, 10000));
+				solo.waitForText(solo.getString(R.string.notification_upload_finished), 0, 15000));
 	}
 
 	public void testDownloadProjectAfterModification() throws Throwable {
@@ -585,9 +571,8 @@ public class ProjectUpAndDownloadTest extends BaseActivityInstrumentationTestCas
 			jsonObject = new JSONObject(resultString);
 			serverProjectId = jsonObject.optInt("projectId");
 			Log.v("serverID=", "" + serverProjectId);
-
 		} catch (JSONException e) {
-			fail("JSON exception orrured");
+			fail("JSON exception occurred");
 		}
 	}
 
@@ -640,5 +625,4 @@ public class ProjectUpAndDownloadTest extends BaseActivityInstrumentationTestCas
 		assertTrue("Original Directory does not exist.", downloadedDirectory.exists());
 		assertTrue("Original Project File does not exist.", downloadedProjectFile.exists());
 	}
-
 }

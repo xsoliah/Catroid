@@ -1,6 +1,6 @@
 /*
  * Catroid: An on-device visual programming system for Android devices
- * Copyright (C) 2010-2014 The Catrobat Team
+ * Copyright (C) 2010-2015 The Catrobat Team
  * (<http://developer.catrobat.org/credits>)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -275,8 +275,7 @@ public final class LookController {
 			updateLookAdapter(imageName, imageFileName, lookDataList, fragment);
 		} catch (IOException e) {
 			Utils.showErrorDialog(activity, R.string.error_load_image);
-		}
-		catch (NullPointerException e) {
+		} catch (NullPointerException e) {
 			Log.e("NullPointerException", "probably originalImagePath null; message: " + e.getMessage());
 			Utils.showErrorDialog(activity, R.string.error_load_image);
 		}
@@ -292,6 +291,18 @@ public final class LookController {
 		Bundle bundle = intent.getExtras();
 		if (bundle != null) {
 			originalImagePath = bundle.getString(Constants.EXTRA_PICTURE_PATH_POCKET_PAINT);
+		}
+
+		Uri imageUri = intent.getData();
+		if (imageUri != null) {
+
+			Cursor cursor = activity.getContentResolver().query(imageUri, new String[] { android.provider.MediaStore.Images.ImageColumns.DATA }, null, null, null);
+
+			if (cursor != null) {
+				cursor.moveToFirst();
+				originalImagePath = cursor.getString(0);
+				cursor.close();
+			}
 		}
 
 		if (originalImagePath == null || originalImagePath.equals("")) {
@@ -339,7 +350,6 @@ public final class LookController {
 				Log.e(TAG, Log.getStackTraceString(ioException));
 			}
 		}
-
 	}
 
 	public void loadPictureFromCameraIntoCatroid(Uri lookFromCameraUri, Activity activity,
@@ -376,7 +386,8 @@ public final class LookController {
 									.parse(Constants.POCKET_PAINT_DOWNLOAD_LINK));
 							activity.startActivity(downloadPocketPaintIntent);
 						}
-					}).setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+					})
+					.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
 						@Override
 						public void onClick(DialogInterface dialog, int id) {
 							dialog.cancel();
