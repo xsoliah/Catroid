@@ -44,6 +44,9 @@ import android.view.SurfaceHolder;
 
 import org.catrobat.catroid.ProjectManager;
 import org.catrobat.catroid.content.Project;
+import org.catrobat.catroid.exceptions.CompatibilityProjectException;
+import org.catrobat.catroid.exceptions.LoadingProjectException;
+import org.catrobat.catroid.exceptions.OutdatedVersionProjectException;
 import org.catrobat.catroid.stage.StageListener;
 
 
@@ -58,18 +61,24 @@ public class LiveWallpaperService extends AndroidLiveWallpaperService implements
 		return context;
 	}
 
+	private static LiveWallpaperService INSTANCE;
+
 	@Override
 	public void onCreateApplication() {
 		Log.d("LWPService", "onCreateApplication()!");
+		INSTANCE = this;
 		this.context = this.getApplicationContext();
-		WallpaperProjectHandler.getInstance().addObserver(this);
+		ProjectManager.getInstance().initializeDefaultProject(this.getBaseContext());
+		StageListener stageListener = new StageListener();
+		this.initialize(stageListener);
+
+		//WallpaperProjectHandler.getInstance().addObserver(this);
 		//WallpaperProjectHandler.getInstance().notifyObservers();
-		this.initialize(new SelectProjectNotificationListener());
+		//this.initialize(new SelectProjectNotificationListener());
 		/*stageListener = new StageListener(true);
 		stageListener = new SelectProjectNotificationListener();
 		AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
-		ProjectManager.getInstance().initializeDefaultProject(this.getBaseContext());
-		this.initialize(stageListener, config);
+		.initialize(stageListener, config);
 		Log.d("LWP|LWPService", "LWP onCreateApplication() called");*/
 	}
 
@@ -89,5 +98,28 @@ public class LiveWallpaperService extends AndroidLiveWallpaperService implements
 	public void onDestroy() {
 		WallpaperProjectHandler.getInstance().deleteObserver(this);
 		super.onDestroy();
+		INSTANCE = null;
+	}
+
+	public static LiveWallpaperService getInstance() {
+		return INSTANCE;
+	}
+
+	public void loadProject(String projectName) {
+		try {
+			Log.d("LWP|Service", "loadProject " + projectName);
+			ProjectManager.getInstance().loadProject(projectName, context);
+			StageListener stageListener = new StageListener();
+			this.initialize(stageListener);
+		}
+		catch(OutdatedVersionProjectException e) {
+			e.printStackTrace();
+		}
+		catch(LoadingProjectException e) {
+			e.printStackTrace();
+		}
+		catch(CompatibilityProjectException e) {
+			e.printStackTrace();
+		}
 	}
 }

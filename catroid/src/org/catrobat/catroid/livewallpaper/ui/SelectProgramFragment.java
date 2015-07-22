@@ -188,6 +188,19 @@ public class SelectProgramFragment extends SherlockListFragment implements OnPro
 
 	public void onProjectClicked(int position) {
 		selectedProject = projectList.get(position).projectName;
+
+		try {
+			LiveWallpaperService lws = LiveWallpaperService.getInstance();
+			//lws.onDestroy();
+			ProjectManager.getInstance().loadProject(projectList.get(position).projectName, LiveWallpaperService.getContext());
+			//lws.onCreateApplication();
+			lws.loadProject(projectList.get(position).projectName);
+		}
+		catch(Exception e)
+		{
+			Log.e("SelectProgramFragment", e.getMessage());
+		}
+		/*
 		final CheckBox checkBox = new CheckBox(getActivity());
 		checkBox.setText(R.string.lwp_enable_sound);
 		final SeekBar seekBar = new SeekBar(getActivity());
@@ -226,7 +239,7 @@ public class SelectProgramFragment extends SherlockListFragment implements OnPro
 		/*if(checkBox.isChecked())
 			soundSeekBarVolume = LiveWallpaper.getInstance().getRememberVolume();
 		seekBar.setProgress(LiveWallpaper.getInstance().getRememberVolume());
-		SoundManager.getInstance().setVolume(LiveWallpaper.getInstance().getRememberVolume());*/
+		SoundManager.getInstance().setVolume(LiveWallpaper.getInstance().getRememberVolume());
 		checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -246,6 +259,7 @@ public class SelectProgramFragment extends SherlockListFragment implements OnPro
 				LinearLayout.LayoutParams.WRAP_CONTENT));
 		linearLayout.addView(checkBox);
 		linearLayout.addView(seekBar);
+
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 		builder.setView(linearLayout);
 		builder.setTitle(selectedProject);
@@ -268,7 +282,7 @@ public class SelectProgramFragment extends SherlockListFragment implements OnPro
 				}
 				LoadWallpaperTask loader = new LoadWallpaperTask(getActivity(),selectedProject, selectProgramFragment);
 				//loader.execute();
-				loader.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);*/
+				loader.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
 				LoadWallpaperTask loader = new LoadWallpaperTask(getActivity(), selectedProject, selectProgramFragment);
 				loader.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
 				Log.d("LWP|SelectProgramFrag", "User wants to load Project: " + selectedProject + " !");
@@ -276,6 +290,7 @@ public class SelectProgramFragment extends SherlockListFragment implements OnPro
 		});
 		AlertDialog alertDialog = builder.create();
 		alertDialog.show();
+		*/
 	}
 
 	private ActionMode.Callback deleteModeCallBack = new ActionMode.Callback() {

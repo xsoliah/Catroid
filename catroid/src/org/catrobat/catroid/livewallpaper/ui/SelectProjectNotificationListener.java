@@ -36,7 +36,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.utils.Align;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 import org.catrobat.catroid.common.Constants;
@@ -71,8 +70,11 @@ public class SelectProjectNotificationListener implements ApplicationListener {
 		batch.setProjectionMatrix(camera.combined);
 
 		batch.begin();
-		font.draw(batch, "Press Settings to load project!", w/2-font.getBounds("Press Settings to load project!").width/2,
+		/*
+		font.draw(batch, "Press Settings to load project!", w/2-font.getBounds("Press Settings to load project!")
+						.width/2,
 															h/2);
+		*/
 		batch.end();
 	}
 
@@ -93,7 +95,6 @@ public class SelectProjectNotificationListener implements ApplicationListener {
 
 		font = new BitmapFont();
 		font.setColor(Color.WHITE);
-		font.setScale(2f);
 	}
 
 	@Override
