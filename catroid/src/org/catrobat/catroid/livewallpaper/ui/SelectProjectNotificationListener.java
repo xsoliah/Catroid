@@ -38,9 +38,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.ScreenUtils;
 
+import org.catrobat.catroid.ProjectManager;
 import org.catrobat.catroid.common.Constants;
+import org.catrobat.catroid.content.Project;
 import org.catrobat.catroid.content.Sprite;
 import org.catrobat.catroid.io.SoundManager;
+import org.catrobat.catroid.stage.StageListener;
 
 import java.util.HashMap;
 import java.util.List;
@@ -59,7 +62,10 @@ public class SelectProjectNotificationListener implements ApplicationListener {
 	private float w,h;
 	private BitmapFont font;
 
-	public SelectProjectNotificationListener() {
+	private LivewallpaperListener listener;
+
+	public SelectProjectNotificationListener(LivewallpaperListener listener) {
+		this.listener = listener;
 	}
 
 	@Override
@@ -70,12 +76,17 @@ public class SelectProjectNotificationListener implements ApplicationListener {
 		batch.setProjectionMatrix(camera.combined);
 
 		batch.begin();
-		/*
-		font.draw(batch, "Press Settings to load project!", w/2-font.getBounds("Press Settings to load project!")
-						.width/2,
-															h/2);
-		*/
+
+		font.draw(batch, "Press Settings to load project!", 1, h/2);
+
 		batch.end();
+
+		if(Gdx.input.isTouched()) {
+			ProjectManager.getInstance().initializeDefaultProject(LiveWallpaperService.context);
+			StageListener stageListener = new StageListener();
+			listener.setActiveListener(stageListener);
+			dispose();
+		}
 	}
 
 	@Override

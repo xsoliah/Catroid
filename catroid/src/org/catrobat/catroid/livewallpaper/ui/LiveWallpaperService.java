@@ -53,9 +53,11 @@ import org.catrobat.catroid.stage.StageListener;
 /**
  * Created by marco on 17.03.15.
  */
-public class LiveWallpaperService extends AndroidLiveWallpaperService implements Observer {
+public class LiveWallpaperService extends AndroidLiveWallpaperService {
 
-	static Context context;
+	public static Context context;
+
+	Project currentProject = null;
 
 	public static Context getContext() {
 		return context;
@@ -67,50 +69,30 @@ public class LiveWallpaperService extends AndroidLiveWallpaperService implements
 	public void onCreateApplication() {
 		Log.d("LWPService", "onCreateApplication()!");
 		INSTANCE = this;
+
 		this.context = this.getApplicationContext();
-		ProjectManager.getInstance().initializeDefaultProject(this.getBaseContext());
-		StageListener stageListener = new StageListener();
-		this.initialize(stageListener);
+		if(currentProject == null)
+			ProjectManager.getInstance().initializeDefaultProject(this.getBaseContext());
 
 		//WallpaperProjectHandler.getInstance().addObserver(this);
 		//WallpaperProjectHandler.getInstance().notifyObservers();
 		//this.initialize(new SelectProjectNotificationListener());
-		/*stageListener = new StageListener(true);
-		stageListener = new SelectProjectNotificationListener();
+		ApplicationListener listener = new LivewallpaperListener();
 		AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
-		.initialize(stageListener, config);
-		Log.d("LWP|LWPService", "LWP onCreateApplication() called");*/
+		initialize(listener, config);
+		Log.d("LWP|LWPService", "LWP onCreateApplication() called");
 	}
-
-	@Override
-	public void update(Observable observable, Object o) {
-		Log.d("LWP|Service", "in update called by observable!");
-		Project project = WallpaperProjectHandler.getInstance().getProject();
-		if(project == null) {
-			this.initialize(new SelectProjectNotificationListener());
-		} else {
-			this.initialize(new StageListener(true, project));
-		}
-
-	}
-
-	@Override
-	public void onDestroy() {
-		WallpaperProjectHandler.getInstance().deleteObserver(this);
-		super.onDestroy();
-		INSTANCE = null;
-	}
-
+	
 	public static LiveWallpaperService getInstance() {
 		return INSTANCE;
 	}
+
+
 
 	public void loadProject(String projectName) {
 		try {
 			Log.d("LWP|Service", "loadProject " + projectName);
 			ProjectManager.getInstance().loadProject(projectName, context);
-			StageListener stageListener = new StageListener();
-			this.initialize(stageListener);
 		}
 		catch(OutdatedVersionProjectException e) {
 			e.printStackTrace();
