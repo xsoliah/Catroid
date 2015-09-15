@@ -20,12 +20,20 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.catrobat.catroid.common.bluetooth;
 
-import org.catrobat.catroid.bluetooth.base.BluetoothConnection;
+package org.catrobat.catroid.livewallpaper.ui;
 
-interface Logger {
-	void logSentData(byte[] b);
-	void logReceivedData(byte[] b);
-	void loggerAttached(BluetoothConnection proxy);
+/**
+ * Created by marco on 17.03.15.
+ */
+public class MyPoint {
+	String text;
+	public int x;
+	public int y;
+
+	public MyPoint(String text, int x, int y) {
+		this.text = text;
+		this.x = x;
+		this.y = y;
+	}
 }

@@ -156,67 +156,18 @@ public class StageListener implements ApplicationListener, AndroidWallpaperListe
 
 	private byte[] thumbnail;
 
-	private boolean isPreview = true;
 	private boolean isLWP = false;
-	private boolean isTinting = false;
-	private com.badlogic.gdx.graphics.Color tintingColor = null;
-	PostProcessorWrapper postProcessorWrapper;
-	private boolean isTest = false;
-	private static boolean liveWallpaperToPocketCodeSwitch = false;
-	private Object renderLock = new Object();
-
-	public StageListener(boolean isLWP, boolean isTest) {
-		super();
-		BroadcastHandler.setStageID(StageID++);
-		this.isLWP = isLWP;
-		this.isTest = isTest;
-	}
-
-	public StageListener(boolean isLWP) {
-		super();
-		BroadcastHandler.setStageID(StageID++);
-		this.isLWP = isLWP;
-		isTest = false;
-	}
 
 	public StageListener() {
-		super();
-		BroadcastHandler.setStageID(StageID++);
-		isLWP = false;
-		isTest = false;
 	}
 
-	public void setTintingColor(int c) {
-		PostProcessingUtil util = new PostProcessingUtil();
-		tintingColor = util.convertIntColorToColor(c);
-	}
-
-	public boolean isTinting(){
-		return isTinting;
-	}
-
-	public com.badlogic.gdx.graphics.Color getTintingColor(){
-		return tintingColor;
-	}
-
-	public void tinting() {
-		if (isTinting) {
-			for (Sprite sprite : sprites) {
-				sprite.look.setColor(tintingColor);
-			}
-		} else {
-			for (Sprite sprite : sprites) {
-				sprite.look.setColor(1, 1, 1, 1);
-			}
+	public StageListener(boolean lwp, Project p) {
+		if(lwp) {
+			isLWP = true;
+			this.project = p;
 		}
-	}
-
-	public void setTinting(boolean isTinting) {
-		this.isTinting = isTinting;
-	}
-
-	public void setLWP(boolean isLWP){
-		this.isLWP = isLWP;
+		else
+			isLWP = false;
 	}
 
 	@Override
@@ -225,12 +176,9 @@ public class StageListener implements ApplicationListener, AndroidWallpaperListe
 		font.setColor(1f, 0f, 0.05f, 1f);
 		font.getData().setScale(1.2f);
 
-		project = null;
-		if (!isLWP) {
-			project = ProjectHandler.getInstance().getPocketCodeProject();
-		} else {
-			project = ProjectHandler.getInstance().getLiveWallpaperProject();
-		}
+		if(!isLWP)
+			project = ProjectManager.getInstance().getCurrentProject();
+
 		pathForScreenshot = Utils.buildProjectPath(project.getName()) + "/";
 
 		virtualWidth = project.getXmlHeader().virtualScreenWidth;
@@ -334,7 +282,8 @@ public class StageListener implements ApplicationListener, AndroidWallpaperListe
 		LedUtil.reset();
 		VibratorUtil.reset();
 
-		ProjectManager.getInstance().getCurrentProject().getDataContainer().resetAllDataObjects();
+		if(!isLWP)
+			ProjectManager.getInstance().getCurrentProject().getDataContainer().resetAllDataObjects();
 
 		reloadProject = true;
 	}
@@ -483,10 +432,10 @@ public class StageListener implements ApplicationListener, AndroidWallpaperListe
 
 			/*
 			 * Necessary for UiTests, when EMMA - code coverage is enabled.
-			 * 
+			 *
 			 * Without setting DYNAMIC_SAMPLING_RATE_FOR_ACTIONS to false(via reflection), before
 			 * the UiTest enters the stage, random segmentation faults(triggered by EMMA) will occur.
-			 * 
+			 *
 			 * Can be removed, when EMMA is replaced by an other code coverage tool, or when a
 			 * future EMMA - update will fix the bugs.
 			 */

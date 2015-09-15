@@ -59,6 +59,8 @@
         android:required="true" />
     <uses-feature android:name="android.software.live_wallpaper" />
 
+    <uses-feature android:name="android.software.live_wallpaper" />
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
@@ -163,42 +165,16 @@
                 <data android:mimeType="audio/*" />
             </intent-filter>
         </activity>
-
-        <service android:name="org.catrobat.catroid.livewallpaper.LiveWallpaper"
-        	android:label="@string/lwp_app_name"
-        	android:permission="android.permission.BIND_WALLPAPER"
-        	android:enabled="true">
+        <service android:name="org.catrobat.catroid.livewallpaper.ui.LiveWallpaperService"
+            android:label="@string/lwp_app_name"
+            android:permission="android.permission.BIND_WALLPAPER"
+            android:enabled="true">
         <intent-filter>
             <action android:name="android.service.wallpaper.WallpaperService"/>
             </intent-filter>
             <meta-data android:name="android.service.wallpaper"
                 android:resource="@xml/livewallpaper"/>
         </service>
-
-        <activity
-            android:name="org.catrobat.catroid.livewallpaper.ui.SelectPostProcessingEffectActivity" android:exported="true"
-            android:parentActivityName="org.catrobat.catroid.livewallpaper.ui.SelectProgramActivity" >
-		</activity>
-
-        <activity
-        android:name="org.catrobat.catroid.livewallpaper.ui.SelectBloomEffectActivity" android:exported="true"
-        android:parentActivityName="org.catrobat.catroid.livewallpaper.ui.SelectPostProcessingEffectActivity" >
-		</activity>
-
-        <activity
-            android:name="org.catrobat.catroid.livewallpaper.ui.SelectVignetteEffectActivity" android:exported="true"
-            android:parentActivityName="org.catrobat.catroid.livewallpaper.ui.SelectPostProcessingEffectActivity" >
-		</activity>
-
-        <activity
-            android:name="org.catrobat.catroid.livewallpaper.ui.SelectCurvatureEffectActivity" android:exported="true"
-            android:parentActivityName="org.catrobat.catroid.livewallpaper.ui.SelectPostProcessingEffectActivity" >
-		</activity>
-
-         <activity
-             android:name="org.catrobat.catroid.livewallpaper.ui.SelectCrtMonitorEffectActivity" android:exported="true"
-             android:parentActivityName="org.catrobat.catroid.livewallpaper.ui.SelectPostProcessingEffectActivity" >
-		</activity>
 
         <activity
             android:name=".livewallpaper.ui.SelectProgramActivity"
@@ -209,8 +185,11 @@
             android:windowSoftInputMode="adjustPan" >
         </activity>
 
+
         <service android:name=".transfers.ProjectUploadService" />
         <service android:name=".transfers.ProjectDownloadService" />
         <service android:name="com.parrot.freeflight.service.DroneControlService"/>
+        <service android:name=".utils.StatusBarNotificationManager$NotificationActionService" />
+
     </application>
 </manifest>
