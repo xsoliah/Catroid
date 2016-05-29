@@ -41,7 +41,6 @@ import org.catrobat.catroid.R;
 import org.catrobat.catroid.common.Constants;
 import org.catrobat.catroid.content.Project;
 import org.catrobat.catroid.content.Sprite;
-import org.catrobat.catroid.content.actions.ExtendedActions;
 import org.catrobat.catroid.formulaeditor.UserVariable;
 import org.catrobat.catroid.ui.adapter.DataAdapter;
 import org.catrobat.catroid.ui.adapter.UserVariableAdapterWrapper;
@@ -135,6 +134,9 @@ public class HideTextBrick extends UserVariableBrick {
 				if (position == 0 && ((UserVariableAdapterWrapper) parent.getAdapter()).isTouchInDropDownView()) {
 					NewDataDialog dialog = new NewDataDialog((Spinner) parent, NewDataDialog.DialogType.USER_VARIABLE);
 					dialog.addVariableDialogListener(HideTextBrick.this);
+					int spinnerPos = ((UserVariableAdapterWrapper) parent.getAdapter())
+							.getPositionOfItem(userVariable);
+					dialog.setUserVariableIfCancel(spinnerPos);
 					dialog.show(((Activity) view.getContext()).getFragmentManager(),
 							NewDataDialog.DIALOG_FRAGMENT_TAG);
 				}
@@ -182,7 +184,7 @@ public class HideTextBrick extends UserVariableBrick {
 			userVariableName = Constants.NO_VARIABLE_SELECTED;
 		}
 
-		sequence.addAction(ExtendedActions.hideText(userVariableName));
+		sequence.addAction(sprite.getActionFactory().createHideTextAction(userVariableName));
 		return null;
 	}
 

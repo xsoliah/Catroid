@@ -57,6 +57,7 @@ import org.catrobat.catroid.R;
 import org.catrobat.catroid.common.Constants;
 import org.catrobat.catroid.common.DefaultProjectHandler;
 import org.catrobat.catroid.common.LookData;
+import org.catrobat.catroid.common.NfcTagData;
 import org.catrobat.catroid.common.ScreenValues;
 import org.catrobat.catroid.common.SoundInfo;
 import org.catrobat.catroid.content.Project;
@@ -126,12 +127,22 @@ public final class Utils {
 		}
 	}
 
-	public static boolean isNetworkAvailable(Context context) {
+	public static boolean isNetworkAvailable(Context context, boolean createDialog) {
 		ConnectivityManager connectivityManager = (ConnectivityManager) context
 				.getSystemService(Context.CONNECTIVITY_SERVICE);
 		NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+		boolean isAvailable = activeNetworkInfo != null && activeNetworkInfo.isConnected();
+		if (!isAvailable && createDialog) {
+			new CustomAlertDialogBuilder(context).setTitle(R.string.no_internet)
+					.setMessage(R.string.error_no_internet).setPositiveButton(R.string.ok, null)
+					.show();
+		}
 
-		return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+		return isAvailable;
+	}
+
+	public static boolean isNetworkAvailable(Context context) {
+		return isNetworkAvailable(context, false);
 	}
 
 	public static boolean checkForNetworkError(boolean success, WebconnectionException exception) {
@@ -349,7 +360,7 @@ public final class Utils {
 		if (ProjectManager.getInstance().getCurrentProject() == null) {
 
 			if (UtilFile.getProjectNames(new File(Constants.DEFAULT_ROOT)).size() == 0) {
-				Log.i("Utils", "Somebody deleted all projects in the file-system");
+				Log.i(TAG, "Somebody deleted all projects in the file-system");
 				ProjectManager.getInstance().initializeDefaultProject(context);
 			}
 
@@ -387,6 +398,26 @@ public final class Utils {
 		return newName;
 	}
 
+	public static String getUniqueNfcTagName(String name) {
+		return searchForNonExistingNfcTagName(name, 0);
+	}
+
+	private static String searchForNonExistingNfcTagName(String name, int nextNumber) {
+		String newName;
+		List<NfcTagData> nfcTagDataList = ProjectManager.getInstance().getCurrentSprite().getNfcTagList();
+		if (nextNumber == 0) {
+			newName = name;
+		} else {
+			newName = name + nextNumber;
+		}
+		for (NfcTagData nfcTagData : nfcTagDataList) {
+			if (nfcTagData.getNfcTagName().equals(newName)) {
+				return searchForNonExistingNfcTagName(name, ++nextNumber);
+			}
+		}
+		return newName;
+	}
+
 	public static String getUniqueLookName(LookData lookData, boolean forBackPack) {
 		return searchForNonExistingLookName(lookData, 0, forBackPack);
 	}
@@ -421,7 +452,7 @@ public final class Utils {
 	private static String searchForNonExistingSpriteName(Sprite sprite, int nextNumber) {
 		String newName;
 		List<Sprite> spriteList;
-		if (!sprite.isBackpackSprite) {
+		if (!sprite.isBackpackObject) {
 			spriteList = BackPackListManager.getInstance().getAllBackPackedSprites();
 		} else {
 			spriteList = ProjectManager.getInstance().getCurrentProject().getSpriteList();

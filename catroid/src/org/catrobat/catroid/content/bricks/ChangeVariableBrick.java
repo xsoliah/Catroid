@@ -44,7 +44,6 @@ import org.catrobat.catroid.R;
 import org.catrobat.catroid.common.BrickValues;
 import org.catrobat.catroid.content.Project;
 import org.catrobat.catroid.content.Sprite;
-import org.catrobat.catroid.content.actions.ExtendedActions;
 import org.catrobat.catroid.formulaeditor.Formula;
 import org.catrobat.catroid.formulaeditor.UserVariable;
 import org.catrobat.catroid.ui.adapter.DataAdapter;
@@ -164,6 +163,9 @@ public class ChangeVariableBrick extends UserVariableBrick {
 				if (position == 0 && ((UserVariableAdapterWrapper) parent.getAdapter()).isTouchInDropDownView()) {
 					NewDataDialog dialog = new NewDataDialog((Spinner) parent, NewDataDialog.DialogType.USER_VARIABLE);
 					dialog.addVariableDialogListener(ChangeVariableBrick.this);
+					int spinnerPos = ((UserVariableAdapterWrapper) parent.getAdapter())
+							.getPositionOfItem(userVariable);
+					dialog.setUserVariableIfCancel(spinnerPos);
 					dialog.show(((Activity) view.getContext()).getFragmentManager(),
 							NewDataDialog.DIALOG_FRAGMENT_TAG);
 				}
@@ -239,7 +241,9 @@ public class ChangeVariableBrick extends UserVariableBrick {
 	public ChangeVariableBrick copyBrickForSprite(Sprite sprite) {
 		Project currentProject = ProjectManager.getInstance().getCurrentProject();
 		ChangeVariableBrick copyBrick = clone();
-		copyBrick.userVariable = currentProject.getDataContainer().getUserVariable(userVariable.getName(), sprite);
+		if (this.userVariable != null) {
+			copyBrick.userVariable = currentProject.getDataContainer().getUserVariable(userVariable.getName(), sprite);
+		}
 		return copyBrick;
 	}
 
@@ -253,8 +257,7 @@ public class ChangeVariableBrick extends UserVariableBrick {
 
 	@Override
 	public List<SequenceAction> addActionToSequence(Sprite sprite, SequenceAction sequence) {
-		sequence.addAction(ExtendedActions.changeVariable(sprite, getFormulaWithBrickField(BrickField.VARIABLE_CHANGE),
-				userVariable));
+		sequence.addAction(sprite.getActionFactory().createChangeVariableAction(sprite, getFormulaWithBrickField(BrickField.VARIABLE_CHANGE), userVariable));
 		return null;
 	}
 

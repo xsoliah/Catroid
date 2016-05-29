@@ -38,6 +38,8 @@ import org.catrobat.catroid.devices.mindstorms.nxt.sensors.NXTSensor;
 import org.catrobat.catroid.formulaeditor.DataContainer;
 import org.catrobat.catroid.formulaeditor.UserList;
 import org.catrobat.catroid.formulaeditor.UserVariable;
+import org.catrobat.catroid.physics.PhysicsWorld;
+import org.catrobat.catroid.physics.content.ActionPhysicsFactory;
 import org.catrobat.catroid.ui.SettingsActivity;
 import org.catrobat.catroid.utils.Utils;
 
@@ -60,19 +62,21 @@ public class Project implements Serializable {
 	@XStreamAlias("settings")
 	private List<Setting> settings = new ArrayList<>();
 
+	private transient PhysicsWorld physicsWorld;
+
 	public Project(Context context, String name, boolean landscapeMode) {
 		xmlHeader.setProgramName(name);
 		xmlHeader.setDescription("");
 
 		xmlHeader.setlandscapeMode(landscapeMode);
 
+		if (ScreenValues.SCREEN_HEIGHT == 0 || ScreenValues.SCREEN_WIDTH == 0) {
+			Utils.updateScreenWidthAndHeight(context);
+		}
 		if (landscapeMode) {
 			ifPortraitSwitchWidthAndHeight();
 		} else {
 			ifLandscapeSwitchWidthAndHeight();
-		}
-		if (ScreenValues.SCREEN_HEIGHT == 0 || ScreenValues.SCREEN_WIDTH == 0) {
-			Utils.updateScreenWidthAndHeight(context);
 		}
 		xmlHeader.virtualScreenWidth = ScreenValues.SCREEN_WIDTH;
 		xmlHeader.virtualScreenHeight = ScreenValues.SCREEN_HEIGHT;
@@ -85,8 +89,8 @@ public class Project implements Serializable {
 		if (context == null) {
 			return;
 		}
-
 		Sprite background = new Sprite(context.getString(R.string.background));
+		background.isBackgroundObject = true;
 		background.look.setZIndex(0);
 		addSprite(background);
 	}
@@ -160,9 +164,18 @@ public class Project implements Serializable {
 
 	public int getRequiredResources() {
 		int resources = Brick.NO_RESOURCES;
+		ActionFactory physicsActionFactory = new ActionPhysicsFactory();
+		ActionFactory actionFactory = new ActionFactory();
 
 		for (Sprite sprite : spriteList) {
-			resources |= sprite.getRequiredResources();
+			int tempResources = sprite.getRequiredResources();
+			if ((tempResources & Brick.PHYSICS) > 0) {
+				sprite.setActionFactory(physicsActionFactory);
+				tempResources &= ~Brick.PHYSICS;
+			} else {
+				sprite.setActionFactory(actionFactory);
+			}
+			resources |= tempResources;
 		}
 		return resources;
 	}
@@ -190,6 +203,17 @@ public class Project implements Serializable {
 			xmlHeader.setApplicationVersion(Utils.getVersionName(context));
 			xmlHeader.setApplicationName(context.getString(R.string.app_name));
 		}
+	}
+
+	public PhysicsWorld getPhysicsWorld() {
+		if (physicsWorld == null) {
+			resetPhysicsWorld();
+		}
+		return physicsWorld;
+	}
+
+	public PhysicsWorld resetPhysicsWorld() {
+		return (physicsWorld = new PhysicsWorld(xmlHeader.virtualScreenWidth, xmlHeader.virtualScreenHeight));
 	}
 
 	// default constructor for XMLParser
@@ -369,7 +393,7 @@ public class Project implements Serializable {
 		return spriteBySpriteName;
 	}
 
-	public boolean isBackgroundSprite(Sprite sprite) {
+	public boolean isBackgroundObject(Sprite sprite) {
 		if (spriteList.indexOf(sprite) == 0) {
 			return true;
 		}

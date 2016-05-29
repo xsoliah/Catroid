@@ -50,6 +50,7 @@ public class ScriptActivityTest extends BaseActivityInstrumentationTestCase<Main
 	@Override
 	public void setUp() throws Exception {
 		super.setUp();
+		UiTestUtils.enableNfcBricks(getActivity().getApplicationContext());
 		UiTestUtils.createTestProject();
 		UiTestUtils.prepareStageForTest();
 		UiTestUtils.getIntoScriptActivityFromMainMenu(solo);
@@ -66,7 +67,7 @@ public class ScriptActivityTest extends BaseActivityInstrumentationTestCase<Main
 		// https://developer.android.com/reference/android/content/pm/ActivityInfo.html
 		PackageManager packageManager = currentActivity.getPackageManager();
 		ActivityInfo activityInfo = packageManager.getActivityInfo(currentActivity.getComponentName(),
-				PackageManager.GET_ACTIVITIES);
+				PackageManager.GET_META_DATA);
 
 		// Note that the activity is _indeed_ rotated on your device/emulator!
 		// Robotium can _force_ the activity to be in landscapeMode mode (and so could we, programmatically)
@@ -91,6 +92,11 @@ public class ScriptActivityTest extends BaseActivityInstrumentationTestCase<Main
 		UiTestUtils.waitForFragment(solo, R.id.fragment_sound);
 
 		checkMainMenuButton();
+
+		UiTestUtils.getIntoNfcTagsFromMainMenu(solo);
+		UiTestUtils.waitForFragment(solo, R.id.fragment_nfctags);
+
+		checkMainMenuButton();
 	}
 
 	public void testPlayProgramButton() {
@@ -107,6 +113,11 @@ public class ScriptActivityTest extends BaseActivityInstrumentationTestCase<Main
 		checkplayProgramButton();
 
 		UiTestUtils.switchToFragmentInScriptActivity(solo, UiTestUtils.SOUNDS_INDEX);
+		assertEquals("Current sprite name is not shown as actionbar title or is wrong", "cat", currentSprite);
+
+		checkplayProgramButton();
+
+		UiTestUtils.switchToFragmentInScriptActivity(solo, UiTestUtils.NFCTAGS_INDEX);
 		assertEquals("Current sprite name is not shown as actionbar title or is wrong", "cat", currentSprite);
 
 		checkplayProgramButton();
@@ -135,6 +146,14 @@ public class ScriptActivityTest extends BaseActivityInstrumentationTestCase<Main
 		assertEquals("Current sprite name is not shown as actionbar title or is wrong", "cat", currentSprite);
 
 		checkSettingsAndGoBack();
+
+		solo.goBack();
+		solo.waitForActivity(ProgramMenuActivity.class);
+		solo.clickOnText(solo.getString(R.string.nfctags));
+		UiTestUtils.waitForFragment(solo, R.id.fragment_nfctags);
+		assertEquals("Current sprite name is not shown as actionbar title or is wrong", "cat", currentSprite);
+
+		checkSettingsAndGoBack();
 	}
 
 	//regression test for issue#626; Android version < 4.2
@@ -160,11 +179,20 @@ public class ScriptActivityTest extends BaseActivityInstrumentationTestCase<Main
 		solo.waitForActivity(StageActivity.class.getSimpleName());
 		solo.assertCurrentActivity("Not in StageActivity", StageActivity.class);
 
+		solo.sleep(500); //StageActivity doesn't seem to handle fast use of goBack
 		solo.goBack();
+		solo.sleep(500);
 		solo.goBack();
 
 		solo.waitForActivity(ScriptActivity.class.getSimpleName());
-		solo.assertCurrentActivity("Not in SoundActivity", ScriptActivity.class);
+		solo.assertCurrentActivity("Not in ScriptActivity", ScriptActivity.class);
+	}
+
+	public void testMainMenuItemsNotVisible() {
+		solo.sendKey(Solo.MENU);
+		assertFalse("rate us is visible", solo.waitForText(solo.getString(R.string.main_menu_rate_app), 1, 5000, false));
+		assertFalse("terms of use is visible", solo.waitForText(solo.getString(R.string.main_menu_terms_of_use), 1, 1000, false));
+		assertFalse("about pocket-code is visible", solo.waitForText(solo.getString(R.string.main_menu_about_pocketcode), 1, 1000, false));
 	}
 
 	private void checkMainMenuButton() {

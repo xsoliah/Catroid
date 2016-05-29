@@ -135,14 +135,16 @@ public class InternFormulaKeyboardAdapter {
 				return buildDoubleParameterFunction(Functions.CONTAINS, InternTokenType.USER_LIST, "list name", InternTokenType.NUMBER, "1");
 
 			//Arduino
-
 			case R.string.formula_editor_function_arduino_read_pin_value_digital:
 				return buildSingleParameterFunction(Functions.ARDUINODIGITAL, InternTokenType.NUMBER, "0");
 			case R.string.formula_editor_function_arduino_read_pin_value_analog:
 				return buildSingleParameterFunction(Functions.ARDUINOANALOG, InternTokenType.NUMBER, "0");
 
-			//SENSOR
+			//RaspberryPi
+			case R.string.formula_editor_function_raspi_read_pin_value_digital:
+				return buildSingleParameterFunction(Functions.RASPIDIGITAL, InternTokenType.NUMBER, "0");
 
+			//SENSOR
 			case R.string.formula_editor_sensor_x_acceleration:
 				return buildSensor(Sensors.X_ACCELERATION);
 			case R.string.formula_editor_sensor_y_acceleration:
@@ -178,6 +180,7 @@ public class InternFormulaKeyboardAdapter {
 			case R.string.formula_editor_phiro_sensor_bottom_right:
 				return buildSensor(Sensors.PHIRO_BOTTOM_RIGHT);
 
+			//NXT SENSOR
 			case R.string.formula_editor_sensor_lego_nxt_1:
 				return buildSensor(Sensors.NXT_SENSOR_1);
 			case R.string.formula_editor_sensor_lego_nxt_2:
@@ -214,7 +217,6 @@ public class InternFormulaKeyboardAdapter {
 				return buildPeriod();
 
 			//OPERATOR
-
 			case R.id.formula_editor_keyboard_plus:
 				return buildOperator(Operators.PLUS);
 			case R.id.formula_editor_keyboard_minus:
@@ -247,14 +249,12 @@ public class InternFormulaKeyboardAdapter {
 				return buildOperator(Operators.LOGICAL_NOT);
 
 			//BRACKETS
-
 			case R.id.formula_editor_keyboard_bracket_open:
 				return buildBracketOpen();
 			case R.id.formula_editor_keyboard_bracket_close:
 				return buildBracketClose();
 
 			//COSTUME
-
 			case R.string.formula_editor_object_x:
 				return buildObject(Sensors.OBJECT_X);
 			case R.string.formula_editor_object_y:
@@ -263,12 +263,20 @@ public class InternFormulaKeyboardAdapter {
 				return buildObject(Sensors.OBJECT_TRANSPARENCY);
 			case R.string.formula_editor_object_brightness:
 				return buildObject(Sensors.OBJECT_BRIGHTNESS);
+			case R.string.formula_editor_object_color:
+				return buildObject(Sensors.OBJECT_COLOR);
 			case R.string.formula_editor_object_size:
 				return buildObject(Sensors.OBJECT_SIZE);
 			case R.string.formula_editor_object_rotation:
 				return buildObject(Sensors.OBJECT_ROTATION);
 			case R.string.formula_editor_object_layer:
 				return buildObject(Sensors.OBJECT_LAYER);
+			case R.string.formula_editor_object_x_velocity:
+				return buildObject(Sensors.OBJECT_X_VELOCITY);
+			case R.string.formula_editor_object_y_velocity:
+				return buildObject(Sensors.OBJECT_Y_VELOCITY);
+			case R.string.formula_editor_object_angular_velocity:
+				return buildObject(Sensors.OBJECT_ANGULAR_VELOCITY);
 		}
 		return null;
 	}

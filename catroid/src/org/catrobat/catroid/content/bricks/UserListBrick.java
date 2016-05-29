@@ -25,8 +25,12 @@ package org.catrobat.catroid.content.bricks;
 
 import android.widget.Spinner;
 
+import com.thoughtworks.xstream.annotations.XStreamOmitField;
+
+import org.catrobat.catroid.ProjectManager;
 import org.catrobat.catroid.content.Project;
 import org.catrobat.catroid.content.Sprite;
+import org.catrobat.catroid.formulaeditor.DataContainer;
 import org.catrobat.catroid.formulaeditor.UserList;
 import org.catrobat.catroid.ui.adapter.UserListAdapterWrapper;
 import org.catrobat.catroid.ui.dialogs.NewDataDialog;
@@ -35,7 +39,8 @@ public abstract class UserListBrick extends FormulaBrick implements NewDataDialo
 
 	protected UserList userList;
 
-	protected transient BackPackedData backPackedData;
+	@XStreamOmitField
+	protected BackPackedData backPackedData;
 
 	private void updateUserListIfDeleted(UserListAdapterWrapper userListAdapterWrapper) {
 		if (userList != null && (userListAdapterWrapper.getPositionOfItem(userList) == 0)) {
@@ -83,15 +88,6 @@ public abstract class UserListBrick extends FormulaBrick implements NewDataDialo
 		return backPackedData;
 	}
 
-	public void setBackPackedData(Project project, UserList userList, Integer userListType) {
-		if (backPackedData == null) {
-			backPackedData = new BackPackedData();
-		}
-		this.backPackedData.project = project;
-		this.backPackedData.userList = userList;
-		this.backPackedData.userListType = userListType;
-	}
-
 	public void setBackPackedData(BackPackedData backPackedData) {
 		this.backPackedData = backPackedData;
 	}
@@ -99,7 +95,6 @@ public abstract class UserListBrick extends FormulaBrick implements NewDataDialo
 	public class BackPackedData {
 		public UserList userList;
 		public Integer userListType;
-		public Project project;
 
 		public BackPackedData() {
 		}
@@ -108,7 +103,6 @@ public abstract class UserListBrick extends FormulaBrick implements NewDataDialo
 			if (backPackedData != null) {
 				this.userList = backPackedData.userList;
 				this.userListType = backPackedData.userListType;
-				this.project = backPackedData.project;
 			}
 		}
 	}
@@ -156,5 +150,22 @@ public abstract class UserListBrick extends FormulaBrick implements NewDataDialo
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public void storeDataForBackPack(Sprite sprite) {
+		Project currentProject = ProjectManager.getInstance().getCurrentProject();
+		Integer type = DataContainer.USER_DATA_EMPTY;
+		if (getUserList() != null) {
+			type = currentProject.getDataContainer()
+					.getTypeOfUserList(getUserList().getName(), ProjectManager
+							.getInstance().getCurrentSprite());
+		}
+
+		if (backPackedData == null) {
+			backPackedData = new BackPackedData();
+		}
+		backPackedData.userList = userList;
+		backPackedData.userListType = type;
 	}
 }

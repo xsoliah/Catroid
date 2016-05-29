@@ -81,6 +81,7 @@ public class SignInDialog extends DialogFragment implements
 		CheckOAuthTokenTask.OnCheckOAuthTokenCompleteListener,
 		CheckEmailAvailableTask.OnCheckEmailAvailableCompleteListener,
 		GetFacebookUserInfoTask.OnGetFacebookUserInfoTaskCompleteListener {
+	private static final String TAG = SignInDialog.class.getSimpleName();
 
 	public static final String DIALOG_FRAGMENT_TAG = "dialog_sign_in";
 	private static final int GPLUS_REQUEST_CODE_SIGN_IN = 0;
@@ -159,7 +160,7 @@ public class SignInDialog extends DialogFragment implements
 					Collection<String> permissions = Arrays.asList(FACEBOOK_PROFILE_PERMISSION, FACEBOOK_EMAIL_PERMISSION);
 					LoginManager.getInstance().logInWithReadPermissions(getActivity(), permissions);
 				} else {
-					ToastUtil.showError(getActivity(), "check connection");
+					Utils.isNetworkAvailable(getActivity(), true);
 				}
 			}
 		});
@@ -170,7 +171,7 @@ public class SignInDialog extends DialogFragment implements
 				if (Utils.isNetworkAvailable(getActivity())) {
 					handleGooglePlusLoginButtonClick(view);
 				} else {
-					ToastUtil.showError(getActivity(), "check connection");
+					Utils.isNetworkAvailable(getActivity(), true);
 				}
 			}
 		});
@@ -242,12 +243,20 @@ public class SignInDialog extends DialogFragment implements
 	}
 
 	private void handleLoginButtonClick() {
+		if (!Utils.isNetworkAvailable(getActivity(), true)) {
+			return;
+		}
+
 		LogInDialog logInDialog = new LogInDialog();
 		logInDialog.show(getActivity().getFragmentManager(), LogInDialog.DIALOG_FRAGMENT_TAG);
 		dismiss();
 	}
 
 	private void handleRegisterButtonClick() {
+		if (!Utils.isNetworkAvailable(getActivity(), true)) {
+			return;
+		}
+
 		RegistrationDialog registrationDialog = new RegistrationDialog();
 		registrationDialog.show(getActivity().getFragmentManager(), RegistrationDialog.DIALOG_FRAGMENT_TAG);
 		dismiss();
@@ -470,7 +479,7 @@ public class SignInDialog extends DialogFragment implements
 
 	@Override
 	public void onGetFacebookUserInfoTaskComplete(String id, String name, String locale, String email) {
-		Log.d("FB", "User Info complete");
+		Log.d(TAG, "FB User Info complete");
 		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
 		sharedPreferences.edit().putString(Constants.FACEBOOK_ID, id).commit();
 		sharedPreferences.edit().putString(Constants.FACEBOOK_USERNAME, name).commit();

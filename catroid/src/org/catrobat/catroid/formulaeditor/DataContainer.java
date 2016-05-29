@@ -49,6 +49,7 @@ public class DataContainer implements Serializable {
 	public static final transient int USER_VARIABLE_USERBRICK = 2;
 	public static final transient int USER_LIST_SPRITE = 4;
 	public static final transient int USER_LIST_PROJECT = 5;
+	public static final transient int USER_DATA_EMPTY = 6;
 
 	@XStreamAlias("programVariableList")
 	private List<UserVariable> projectVariables;
@@ -477,6 +478,24 @@ public class DataContainer implements Serializable {
 		}
 		for (UserList list : lists) {
 			if (list.getName().equals(listName)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public boolean existListInAnySprite(String listName, List<Sprite> sprites) {
+		for (Sprite sprite : sprites) {
+			if (existSpriteListByName(listName, sprite)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public boolean existVariableInAnySprite(String variableName, List<Sprite> sprites) {
+		for (Sprite sprite : sprites) {
+			if (existSpriteVariableByName(variableName, sprite)) {
 				return true;
 			}
 		}

@@ -34,6 +34,7 @@ import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.TextAppearanceSpan;
 import android.util.Log;
+import android.view.Menu;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -119,10 +120,8 @@ public class MainMenuActivity extends BaseActivity implements OnLoadProjectCompl
 			setContentView(R.layout.activity_main_menu);
 
 			final ActionBar actionBar = getActionBar();
-			if (actionBar != null) {
-				actionBar.setDisplayUseLogoEnabled(true);
-				actionBar.setTitle(R.string.app_name);
-			}
+			actionBar.setDisplayUseLogoEnabled(true);
+			actionBar.setTitle(R.string.app_name);
 
 			findViewById(R.id.main_menu_button_continue).setEnabled(false);
 
@@ -132,11 +131,6 @@ public class MainMenuActivity extends BaseActivity implements OnLoadProjectCompl
 
 			if (loadExternalProjectUri != null) {
 				loadProgramFromExternalSource(loadExternalProjectUri);
-			}
-
-			if (!BackPackListManager.getInstance().isBackpackFlag()) {
-				BackPackListManager.getInstance().clearBackPackSounds();
-				BackPackListManager.getInstance().clearBackPackLooks();
 			}
 		}
 	}
@@ -294,6 +288,12 @@ public class MainMenuActivity extends BaseActivity implements OnLoadProjectCompl
 		}
 	}
 
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.menu_main_menu, menu);
+		return super.onCreateOptionsMenu(menu);
+	}
+
 	// needed because of android:onClick in activity_main_menu.xml
 	public void handleContinueButton(View view) {
 		handleContinueButton();
@@ -309,7 +309,7 @@ public class MainMenuActivity extends BaseActivity implements OnLoadProjectCompl
 		if (!viewSwitchLock.tryLock()) {
 			return;
 		}
-		LoadProjectTask loadProjectTask = new LoadProjectTask(this, projectName, false, true);
+		LoadProjectTask loadProjectTask = new LoadProjectTask(this, projectName, true, true);
 		loadProjectTask.setOnLoadProjectCompleteListener(this);
 		loadProjectTask.execute();
 	}
@@ -343,6 +343,10 @@ public class MainMenuActivity extends BaseActivity implements OnLoadProjectCompl
 	}
 
 	public void handleHelpButton(View view) {
+		if (!Utils.isNetworkAvailable(view.getContext(), true)) {
+			return;
+		}
+
 		if (!viewSwitchLock.tryLock()) {
 			return;
 		}
@@ -351,6 +355,10 @@ public class MainMenuActivity extends BaseActivity implements OnLoadProjectCompl
 	}
 
 	public void handleWebButton(View view) {
+		if (!Utils.isNetworkAvailable(view.getContext(), true)) {
+			return;
+		}
+
 		if (!viewSwitchLock.tryLock()) {
 			return;
 		}
@@ -374,6 +382,10 @@ public class MainMenuActivity extends BaseActivity implements OnLoadProjectCompl
 	}
 
 	public void handleUploadButton(View view) {
+		if (!Utils.isNetworkAvailable(view.getContext(), true)) {
+			return;
+		}
+
 		if (!viewSwitchLock.tryLock()) {
 			return;
 		}

@@ -39,6 +39,7 @@ import org.catrobat.catroid.content.bricks.BroadcastReceiverBrick;
 import org.catrobat.catroid.content.bricks.BroadcastWaitBrick;
 import org.catrobat.catroid.content.bricks.CameraBrick;
 import org.catrobat.catroid.content.bricks.ChangeBrightnessByNBrick;
+import org.catrobat.catroid.content.bricks.ChangeColorByNBrick;
 import org.catrobat.catroid.content.bricks.ChangeSizeByNBrick;
 import org.catrobat.catroid.content.bricks.ChangeTransparencyByNBrick;
 import org.catrobat.catroid.content.bricks.ChangeVariableBrick;
@@ -88,10 +89,14 @@ import org.catrobat.catroid.content.bricks.PlaySoundBrick;
 import org.catrobat.catroid.content.bricks.PointInDirectionBrick;
 import org.catrobat.catroid.content.bricks.PointInDirectionBrick.Direction;
 import org.catrobat.catroid.content.bricks.PointToBrick;
+import org.catrobat.catroid.content.bricks.RaspiIfLogicBeginBrick;
+import org.catrobat.catroid.content.bricks.RaspiPwmBrick;
+import org.catrobat.catroid.content.bricks.RaspiSendDigitalValueBrick;
 import org.catrobat.catroid.content.bricks.RepeatBrick;
 import org.catrobat.catroid.content.bricks.ReplaceItemInUserListBrick;
 import org.catrobat.catroid.content.bricks.ScriptBrick;
 import org.catrobat.catroid.content.bricks.SetBrightnessBrick;
+import org.catrobat.catroid.content.bricks.SetColorBrick;
 import org.catrobat.catroid.content.bricks.SetLookBrick;
 import org.catrobat.catroid.content.bricks.SetSizeToBrick;
 import org.catrobat.catroid.content.bricks.SetTransparencyBrick;
@@ -109,12 +114,23 @@ import org.catrobat.catroid.content.bricks.UserBrick;
 import org.catrobat.catroid.content.bricks.VibrationBrick;
 import org.catrobat.catroid.content.bricks.WaitBrick;
 import org.catrobat.catroid.content.bricks.WhenBrick;
+import org.catrobat.catroid.content.bricks.WhenNfcBrick;
+import org.catrobat.catroid.content.bricks.WhenRaspiPinChangedBrick;
 import org.catrobat.catroid.content.bricks.WhenStartedBrick;
 import org.catrobat.catroid.formulaeditor.Formula;
 import org.catrobat.catroid.formulaeditor.FormulaElement;
 import org.catrobat.catroid.formulaeditor.FormulaElement.ElementType;
 import org.catrobat.catroid.formulaeditor.Operators;
 import org.catrobat.catroid.formulaeditor.Sensors;
+import org.catrobat.catroid.physics.content.bricks.CollisionReceiverBrick;
+import org.catrobat.catroid.physics.content.bricks.SetBounceBrick;
+import org.catrobat.catroid.physics.content.bricks.SetFrictionBrick;
+import org.catrobat.catroid.physics.content.bricks.SetGravityBrick;
+import org.catrobat.catroid.physics.content.bricks.SetMassBrick;
+import org.catrobat.catroid.physics.content.bricks.SetPhysicsObjectTypeBrick;
+import org.catrobat.catroid.physics.content.bricks.SetVelocityBrick;
+import org.catrobat.catroid.physics.content.bricks.TurnLeftSpeedBrick;
+import org.catrobat.catroid.physics.content.bricks.TurnRightSpeedBrick;
 import org.catrobat.catroid.ui.SettingsActivity;
 import org.catrobat.catroid.ui.UserBrickScriptActivity;
 
@@ -156,6 +172,8 @@ public class CategoryBricksFactory {
 			tempList = setupDroneCategoryList();
 		} else if (category.equals(context.getString(R.string.category_phiro))) {
 			tempList = setupPhiroProCategoryList();
+		} else if (category.equals(context.getString(R.string.category_raspi))) {
+			tempList = setupRaspiCategoryList();
 		}
 
 		for (Brick brick : tempList) {
@@ -179,9 +197,12 @@ public class CategoryBricksFactory {
 		controlBrickList.add(new WaitBrick(BrickValues.WAIT));
 
 		final String broadcastMessage = MessageContainer.getFirst(context);
+
 		controlBrickList.add(new BroadcastReceiverBrick(broadcastMessage));
 		controlBrickList.add(new BroadcastBrick(broadcastMessage));
 		controlBrickList.add(new BroadcastWaitBrick(broadcastMessage));
+
+		controlBrickList.add(new CollisionReceiverBrick("object"));
 
 		controlBrickList.add(new NoteBrick(context.getString(R.string.brick_note_default_value)));
 		controlBrickList.add(new ForeverBrick());
@@ -193,6 +214,10 @@ public class CategoryBricksFactory {
 
 		if (SettingsActivity.isPhiroSharedPreferenceEnabled(context)) {
 			controlBrickList.add(new PhiroIfLogicBeginBrick());
+		}
+
+		if (SettingsActivity.isNfcSharedPreferenceEnabled(context)) {
+			controlBrickList.add(new WhenNfcBrick());
 		}
 
 		return controlBrickList;
@@ -263,6 +288,15 @@ public class CategoryBricksFactory {
 			motionBrickList.add(new VibrationBrick(BrickValues.VIBRATE_SECONDS));
 		}
 
+		motionBrickList.add(new SetPhysicsObjectTypeBrick(BrickValues.PHYSIC_TYPE));
+		motionBrickList.add(new SetVelocityBrick(BrickValues.PHYSIC_VELOCITY));
+		motionBrickList.add(new TurnLeftSpeedBrick(BrickValues.PHYSIC_TURN_DEGREES));
+		motionBrickList.add(new TurnRightSpeedBrick(BrickValues.PHYSIC_TURN_DEGREES));
+		motionBrickList.add(new SetGravityBrick(BrickValues.PHYSIC_GRAVITY));
+		motionBrickList.add(new SetMassBrick(BrickValues.PHYSIC_MASS));
+		motionBrickList.add(new SetBounceBrick(BrickValues.PHYSIC_BOUNCE_FACTOR * 100));
+		motionBrickList.add(new SetFrictionBrick(BrickValues.PHYSIC_FRICTION * 100));
+
 		if (SettingsActivity.isPhiroSharedPreferenceEnabled(context)) {
 			motionBrickList.add(new PhiroMotorMoveForwardBrick(PhiroMotorMoveForwardBrick.Motor.MOTOR_LEFT,
 					BrickValues.PHIRO_SPEED));
@@ -310,9 +344,11 @@ public class CategoryBricksFactory {
 		looksBrickList.add(new HideBrick());
 		looksBrickList.add(new ShowBrick());
 		looksBrickList.add(new SetTransparencyBrick(BrickValues.SET_TRANSPARENCY));
-		looksBrickList.add(new ChangeTransparencyByNBrick(BrickValues.CHANGE_GHOST_EFFECT));
+		looksBrickList.add(new ChangeTransparencyByNBrick(BrickValues.CHANGE_TRANSPARENCY_EFFECT));
 		looksBrickList.add(new SetBrightnessBrick(BrickValues.SET_BRIGHTNESS_TO));
 		looksBrickList.add(new ChangeBrightnessByNBrick(BrickValues.CHANGE_BRITHNESS_BY));
+		looksBrickList.add(new SetColorBrick(BrickValues.SET_COLOR_TO));
+		looksBrickList.add(new ChangeColorByNBrick(BrickValues.CHANGE_COLOR_BY));
 		looksBrickList.add(new ClearGraphicEffectBrick());
 		if (BuildConfig.FEATURE_FLASH_BRICK_ENABLED) {
 			looksBrickList.add(new FlashBrick());
@@ -404,6 +440,17 @@ public class CategoryBricksFactory {
 		arduinoBrickList.add(new ArduinoSendPWMValueBrick(BrickValues.ARDUINO_PWM_INITIAL_PIN_NUMBER, BrickValues.ARDUINO_PWM_INITIAL_PIN_VALUE));
 
 		return arduinoBrickList;
+	}
+
+	private List<Brick> setupRaspiCategoryList() {
+		List<Brick> raspiBrickList = new ArrayList<Brick>();
+		raspiBrickList.add(new WhenRaspiPinChangedBrick(null));
+		raspiBrickList.add(new RaspiSendDigitalValueBrick(BrickValues.RASPI_DIGITAL_INITIAL_PIN_NUMBER, BrickValues.RASPI_DIGITAL_INITIAL_PIN_VALUE));
+		raspiBrickList.add(new RaspiPwmBrick(BrickValues.RASPI_DIGITAL_INITIAL_PIN_NUMBER, BrickValues
+				.RASPI_PWM_INITIAL_FREQUENCY, BrickValues.RASPI_PWM_INITIAL_PERCENTAGE));
+		raspiBrickList.add(new RaspiIfLogicBeginBrick(BrickValues.RASPI_DIGITAL_INITIAL_PIN_NUMBER));
+
+		return raspiBrickList;
 	}
 
 	private boolean isBackground(Sprite sprite) {

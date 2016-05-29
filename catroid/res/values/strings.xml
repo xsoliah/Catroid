@@ -21,7 +21,7 @@
   ~ You should have received a copy of the GNU Affero General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <!-- General terms -->
     <string name="app_name">Pocket Code</string>
@@ -47,16 +47,17 @@
     <string name="error">Error</string>
     <string name="please_wait">Please wait</string>
     <string name="loading">Loading…</string>
+    <string name="no_internet">No Internet</string>
     <string name="loading_check_token">Token is checked on our server…</string>
     <string name="loading_check_facebook_data">Facebook data is retrieved…</string>
     <string name="loading_check_email">E-Mail availability is checked on our server…</string>
     <string name="loading_check_oauth_token">OAuth token is checked on our server…</string>
-    <string name="loading_check_facebook_token_validity">Facebook token validity is checked on our server&#8230;</string>
-    <string name="loading_check_oauth_username">Username availability is checked on our server&#8230;</string>
-    <string name="loading_facebook_exchange_token">Facebook token is exchanged on our server&#8230;</string>
-    <string name="loading_facebook_login">Facebook login is completed on our server&#8230;</string>
-    <string name="loading_google_exchange_code">Google+ code is exchanged on our server&#8230;</string>
-    <string name="loading_google_login">Google+ login is completed on our server&#8230;</string>
+    <string name="loading_check_facebook_token_validity">Facebook token validity is checked on our server…</string>
+    <string name="loading_check_oauth_username">Username availability is checked on our server…</string>
+    <string name="loading_facebook_exchange_token">Facebook token is exchanged on our server…</string>
+    <string name="loading_facebook_login">Facebook login is completed on our server…</string>
+    <string name="loading_google_exchange_code">Google+ code is exchanged on our server…</string>
+    <string name="loading_google_login">Google+ login is completed on our server…</string>
     <string name="background">Background</string>
     <string name="stage">Stage</string>
     <string name="ok">OK</string>
@@ -75,6 +76,7 @@
     <string name="nothing_to_delete">Nothing to delete</string>
     <string name="nothing_to_rename">Nothing to rename</string>
     <string name="unpack_background">Program\'s background will be replaced</string>
+    <string name="degrees">degrees</string>
     <!--  -->
 
 
@@ -112,7 +114,17 @@
     <string name="preference_title_enable_phiro_bricks">Phiro bricks</string>
     <string name="preference_description_phiro_bricks">Allow to control Phiro robots</string>
     <string name="preference_title_enable_arduino_bricks">Arduino bricks</string>
+    <string name="preference_title_enable_nfc_bricks">Near Field Communication</string>
+    <string name="preference_description_nfc_bricks">Allow to use NFC tags in programs</string>
+    <!-- -->
     <string name="preference_description_arduino_bricks">Allow to control Arduino boards</string>
+    <string name="preference_title_enable_raspi_bricks">Raspberry Pi bricks</string>
+    <string name="preference_description_raspi_bricks">Allow to control Raspberry Pi computers</string>
+    <string name="preference_raspi_enable_bricks">Enable Raspberry Pi bricks</string>
+    <string name="preference_raspi_help">Help / Getting started</string>
+    <string name="preference_raspi_help_summary">Get help on how to configure the connection settings</string>
+    <string name="preference_raspi_host">Raspberry Pi IP-/Host-Address</string>
+    <string name="preference_raspi_port">Raspberry Pi Port</string>
     <!--  -->
 
 
@@ -174,6 +186,8 @@
     <string name="dialog_confirm_delete_object_message">This cannot be undone!</string>
     <string name="select_all">Select all</string>
     <string name="deselect_all">Deselect all</string>
+    <string name="backpack_replace_object">The object "%1$s" already exists in the backpack. Do you want to replace it?</string>
+    <string name="backpack_replace_object_multiple">Objects already exist in the backpack. Do you want to replace them?</string>
     <!--  -->
 
 
@@ -191,8 +205,7 @@
     <string name="size">Size:</string>
     <string name="script_group">Script Group</string>
     <string name="script_groups">Script Groups</string>
-    <string name="script_group_name_given">Script Group with this name already exists. Please choose a different one
-        !</string>
+    <string name="script_group_name_given">Script Group with this name already exists. Please choose a different one!</string>
     <!--  -->
 
 
@@ -206,15 +219,15 @@
     <string name="dialog_confirm_delete_brick_message">This cannot be undone!</string>
 
     <plurals name="number_of_bricks_to_delete">
-        <item quantity="one">Delete 1 Brick</item>
+        <item quantity="one">Delete %d Brick</item>
         <item quantity="other">Delete %d Bricks</item>
     </plurals>
     <plurals name="number_of_bricks_to_copy">
-        <item quantity="one">Copy 1 Brick</item>
+        <item quantity="one">Copy %d Brick</item>
         <item quantity="other">Copy %d Bricks</item>
     </plurals>
     <plurals name="number_of_bricks_to_backpack">
-        <item quantity="one">Backpack 1 Brick</item>
+        <item quantity="one">Backpack %d Brick</item>
         <item quantity="other">Backpack %d Bricks</item>
     </plurals>
     <!--  -->
@@ -236,6 +249,8 @@
     <string name="dialog_confirm_delete_multiple_looks_title">Delete these Looks?</string>
     <string name="dialog_confirm_delete_look_message">This cannot be undone!</string>
     <string name="lookname">Look name:</string>
+    <string name="backpack_replace_look">The look "%1$s" already exists in the backpack. Do you want to replace it?</string>
+    <string name="backpack_replace_look_multiple">Looks already exist in the backpack. Do you want to replace them?</string>
     <!--  -->
 
 
@@ -256,6 +271,25 @@
     <string name="sound_name">Sound name:</string>
     <string name="new_sound_name">Sound name:</string>
     <string name="rename_sound_overwrite">Sound with this name already exists. Please choose a different one!</string>
+    <string name="backpack_replace_sound">The sound "%1$s" already exists in the backpack. Do you want to replace it?</string>
+    <string name="backpack_replace_sound_multiple">Sounds already exist in the backpack. Do you want to replace them?</string>
+    <!--  -->
+
+
+    <!-- NfcTags fragment -->
+    <string name="fragment_nfctag_text_description">Scan tags to add</string>
+    <string name="rename_nfctag_dialog">Rename nfctag</string>
+    <string name="nfctagname_invalid">This nfctag\'s name is invalid</string>
+    <string name="nfctag_scan">scan</string>
+    <string name="delete_nfctag_dialog">Delete nfctag?</string>
+    <string name="dialog_confirm_delete_nfctag_title">Delete this nfctag?</string>
+    <string name="dialog_confirm_delete_multiple_nfctags_title">Delete these nfctags?</string>
+    <string name="dialog_confirm_delete_nfctag_message">This can not be undone!</string>
+    <string name="nfctag_name">nfctag name:</string>
+    <string name="nfctag">NFC Tag</string>
+    <string name="nfctags">NFC Tags</string>
+    <string name="uid">ID</string>
+    <string name="default_tag_name">nfc_tag</string>
     <!--  -->
 
     <plurals name="unpacking_items_plural">
@@ -314,6 +348,10 @@
     <string name="prestage_no_camera_available">\u2022 Facedetection\n</string>
     <string name="prestage_no_front_camera_available">\u2022 Front facing camera\n</string>
     <string name="prestage_default_resource_not_available">\u2022 Unknown component\n</string>
+    <string name="no_nfc_available">NFC not available</string>
+    <string name="nfc_not_activated">Please activate NFC and press Back to return to the application!</string>
+    <string name="nfc_facedetection_support">The combination of NFC and facedetection might lead to performance
+        issues!</string>
     <!--  -->
 
 
@@ -431,6 +469,11 @@
     <string name="dialog_new_broadcast_message_name">message:</string>
     <!--  -->
 
+    <!-- NFC spinner -->
+    <string name="new_nfc_tag">New…</string>
+    <string name="brick_when_nfc_default_all">all</string>
+    <!-- -->
+
 
     <!-- Brick categories -->
     <string name="categories">Categories</string>
@@ -444,6 +487,7 @@
     <string name="category_drone">ARDrone</string>
     <string name="category_phiro">Phiro</string>
     <string name="category_arduino">Arduino</string>
+    <string name="category_raspi">Raspberry Pi</string>
     <!--  -->
 
     <!-- Motion bricks -->
@@ -478,6 +522,23 @@
     <string name="brick_glide_to_x">to X:</string>
     <!--  -->
 
+    <!-- Physics -->
+    <string name="default_project_name_physics">My first physics program</string>
+    <string name="brick_set_physics_object_type">Set motion type to</string>
+    <string name="brick_set_physics_object_type_dynamic">bouncing with gravity</string>
+    <string name="brick_set_physics_object_type_fixed">others bounce off it</string>
+    <string name="brick_set_physics_object_type_no">no bouncing</string>
+    <string name="brick_set_mass">"Set mass to "</string>
+    <string name="brick_set_mass_unit">kilogram</string>
+    <string name="brick_set_gravity_to">"Set gravity for all objects to "</string>
+    <string name="brick_set_gravity_unit">steps/second²</string>
+    <string name="brick_set_velocity_to">"Set velocity to "</string>
+    <string name="brick_set_velocity_unit">steps/second</string>
+    <string name="brick_turn_speed_unit">degrees/second</string>
+    <string name="brick_set_friction">"Set friction to "</string>
+    <string name="brick_set_bounce_factor">"Set bounce factor to "</string>
+    <string name="brick_rotate_left">"Rotate left "</string>
+    <string name="brick_rotate_right">"Rotate right "</string>
 
     <!-- Looks bricks -->
     <string name="brick_set_look">Switch to look</string>
@@ -490,6 +551,8 @@
     <string name="brick_change_ghost_effect">"Change transparency "</string>
     <string name="brick_set_brightness">"Set brightness "</string>
     <string name="brick_change_brightness">"Change brightness "</string>
+    <string name="brick_set_color">"Set color "</string>
+    <string name="brick_change_color">"Change color "</string>
     <string name="by_label">by</string>
     <string name="to_label">to</string>
     <string name="brick_clear_graphic_effect">Clear graphic effects</string>
@@ -516,11 +579,15 @@
     <string name="brick_when_started">When program started</string>
     <string name="brick_when">When tapped</string>
     <string name="brick_wait">Wait</string>
+    <string name="brick_when_nfc">When NFC</string>
 
     <plurals name="second_plural">
         <item quantity="one">"second "</item>
         <item quantity="other">"seconds "</item>
     </plurals>
+
+    <string name="brick_collision_receive">When physical collision with</string>
+    <string name="collision_with_anything">anything</string>
 
     <string name="brick_broadcast_receive">When I receive</string>
     <string name="brick_broadcast">Broadcast</string>
@@ -539,6 +606,7 @@
     <string name="brick_if_begin_second_part">is true then</string>
     <string name="brick_if_else">Else</string>
     <string name="brick_if_end">End If</string>
+    <string name="brick_broadcast_invalid_symbol">"Message reserved for:\n\"When physical collision between\"-Brick\nPlease try again!"</string>
     <string name="brick_set_variable">Set variable</string>
     <string name="brick_change_variable">Change variable</string>
     <string name="brick_variable_spinner_create_new_variable">New…</string>
@@ -607,16 +675,16 @@
     <string name="drone_set_vertical_max">2000 mm/s</string>
 
     <!-- Drone max rotation speed limit values  -->
-    <string name="drone_set_rotation_min">40 °/s</string>
-    <string name="drone_set_rotation_indoor">100 °/s</string>
-    <string name="drone_set_rotation_outdoor">200 °/s</string>
-    <string name="drone_set_rotation_max">350 °/s</string>
+    <string name="drone_set_rotation_min">40 degrees/s</string>
+    <string name="drone_set_rotation_indoor">100 degrees/s</string>
+    <string name="drone_set_rotation_outdoor">200 degrees/s</string>
+    <string name="drone_set_rotation_max">350 degrees/s</string>
 
     <!-- Drone max tilt limit values  -->
-    <string name="drone_set_tilt_min">5 °</string>
-    <string name="drone_set_tilt_indoor">12 °</string>
-    <string name="drone_set_tilt_outdoor">20 ° </string>
-    <string name="drone_set_tilt_max">30 °</string>
+    <string name="drone_set_tilt_min">5 degrees</string>
+    <string name="drone_set_tilt_indoor">12 degrees</string>
+    <string name="drone_set_tilt_outdoor">20 degrees </string>
+    <string name="drone_set_tilt_max">30 degrees</string>
 
     <!-- Notifications -->
     <string name="notification_invalid_text_entered">Please enter a value</string>
@@ -668,9 +736,10 @@
     <string name="error_screenshot_failed">An error occurred while saving the preview image.</string>
     <string name="error_load_image">An error occurred while loading the image.</string>
     <string name="error_load_image_special_chars">Cannot load image. Does the filename contain special
-        characters (e.g. &#36;, &#37;, &amp;, &#8230;)? </string>
+        characters (e.g. &#36;, &#37;, &amp;, …)? </string>
     <string name="error_load_sound">An error occurred while loading the sound.</string>
     <string name="error_internet_connection">An unknown error occurred. Check your Internet connection.</string>
+    <string name="error_no_internet">Please establish an Internet connection.</string>
     <string name="error_project_compatability">The program is not compatible with this version of Pocket Code.</string>
     <string name="error_outdated_pocketcode_version">The Pocket Code version is outdated. Update now?</string>
     <string name="error_copy_project">An error occurred while copying the program.</string>
@@ -695,7 +764,7 @@
     <string name="notification_blueth_err">Bluetooth could not be enabled, closing stage</string>
     <string name="title_paired_devices">Paired devices</string>
     <string name="title_other_devices">New devices</string>
-    <string name="searching_devices">Looking for devices&#8230;</string>
+    <string name="searching_devices">Looking for devices…</string>
     <string name="button_scan">Search Bluetooth devices</string>
     <string name="select_device">Select Device:</string>
     <string name="connecting_please_wait">Connecting to your device.\nPlease wait…</string>
@@ -709,6 +778,23 @@
     <string name="brick_arduino_select_digital_value">Set Arduino digital pin</string>
     <string name="brick_arduino_select_analog_value">Set Arduino PWM~ pin</string>
     <string name="brick_arduino_set_pin_value_to">to</string>
+    <!--  -->
+
+    <!-- Raspi Bricks -->
+    <string name="brick_raspi_select_digital_value">Set Raspberry Pi pin</string>
+    <string name="brick_raspi_set_pin_value_to">to</string>
+    <string name="brick_raspi_if_begin">If Raspberry Pi pin</string>
+    <string name="brick_raspi_if_begin_second_part">is true then</string>
+    <string name="brick_raspi_when_begin">When Raspberry Pi pin</string>
+    <string name="brick_raspi_when_equals">changes to</string>
+    <string name="brick_raspi_pressed_text">High</string>
+    <string name="brick_raspi_released_text">Low</string>
+    <string name="brick_raspi_set_pwm">Set Raspberry Pi PWM pin</string>
+    <!--  -->
+
+    <!-- Raspi Settings -->
+    <string name="raspi_settings_title_name">Raspberry Pi Settings</string>
+    <string name="raspi_settings_gpio_version">GPIO Version</string>
     <!--  -->
 
     <!-- Lego Mindstorms Strings -->
@@ -871,6 +957,7 @@
     <string name="formula_editor_function_log_parameter">(0)</string>
     <string name="formula_editor_function_pi">pi</string>
     <string name="formula_editor_function_pi_parameter"></string>
+    <string name="formula_editor_object_color">color</string>
     <string name="formula_editor_function_sqrt">sqrt</string>
     <string name="formula_editor_function_sqrt_parameter">(0)</string>
     <string name="formula_editor_function_rand">random</string>
@@ -907,6 +994,7 @@
     <string name="formula_editor_function_join_parameter">(\'hello\',\'world\')</string>
     <string name="formula_editor_function_arduino_read_pin_value_digital">arduino_digital_pin</string>
     <string name="formula_editor_function_arduino_read_pin_value_analog">arduino_analog_pin</string>
+    <string name="formula_editor_function_raspi_read_pin_value_digital">raspberry_pi_pin</string>
     <string name="formula_editor_function_list_item">element</string>
     <string name="formula_editor_function_list_item_parameter">(1,*list name*)</string>
     <string name="formula_editor_function_contains">contains</string>
@@ -945,6 +1033,9 @@
     <string name="formula_editor_object_size">size</string>
     <string name="formula_editor_object_rotation">direction</string>
     <string name="formula_editor_object_layer">layer</string>
+    <string name="formula_editor_object_x_velocity">x_velocity</string>
+    <string name="formula_editor_object_y_velocity">y_velocity</string>
+    <string name="formula_editor_object_angular_velocity">angular_velocity</string>
     <string name="formula_editor_compute">Compute</string>
     <string name="formula_editor_object">Object</string>
     <string name="formula_editor_math">Functions</string>
@@ -1006,7 +1097,7 @@
     <string name="edit_variable">Edit variable</string>
     <string name="variable_hint">Variable name</string>
     <string name="brick_show_text_var">Show variable</string>
-    <string name="brick_show_text_pos">"at  "</string>
+    <string name="brick_show_text_pos">"at "</string>
     <string name="brick_hide_text_var">Hide variable</string>
     <!-- -->
 
@@ -1025,8 +1116,8 @@
 
     <string name="warning">Warning</string>
     <string name="error_merge_with_self">Caution! Current project and selected project are the same!</string>
-    <string name="error_different_resolutions">Caution! Different resolutions detected. %1$s has resolution %2$dx%3$d
-        and %4$s has resolution %5$dx%6$d. Using resolution of %1$s.</string>
+    <string name="error_different_resolutions" tools:ignore="PluralsCandidate">Caution! Different resolutions detected. %1$s
+        has resolution %2$dx%3$d and %4$s has resolution %5$dx%6$d. Using resolution of %1$s.</string>
     <string name="abort">Abort</string>
 
     <string name="merge_conflict">Merging not possible</string>
@@ -1048,4 +1139,11 @@
         camera\" brick and change to your device\'s back camera. "</string>
     <!-- -->
 
+    <!-- Rating Dialog -->
+    <string name="rating_dialog_title">Rate Pocket Code</string>
+    <string name="rating_dialog_text">If you enjoy Pocket Code, please rate us on Google Play!</string>
+    <string name="rating_dialog_rate_now">Now</string>
+    <string name="rating_dialog_rate_later">Later</string>
+    <string name="rating_dialog_rate_never">Never</string>
+    <!--  -->
 </resources>

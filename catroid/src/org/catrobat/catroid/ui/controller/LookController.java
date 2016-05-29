@@ -25,12 +25,14 @@ package org.catrobat.catroid.ui.controller;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.FragmentTransaction;
+import android.content.Context;
 import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.CursorIndexOutOfBoundsException;
 import android.net.Uri;
@@ -72,6 +74,7 @@ public final class LookController {
 	public static final int REQUEST_POCKET_PAINT_EDIT_IMAGE = 1;
 	public static final int REQUEST_TAKE_PICTURE = 2;
 	public static final int REQUEST_MEDIA_LIBRARY = 3;
+	public static final int REQUEST_DRONE_VIDEO = 4;
 	public static final int ID_LOADER_MEDIA_IMAGE = 1;
 	public static final String BUNDLE_ARGUMENTS_SELECTED_LOOK = "selected_look";
 	public static final String BUNDLE_ARGUMENTS_URI_IS_SET = "uri_is_set";
@@ -80,6 +83,8 @@ public final class LookController {
 
 	private static final String TAG = LookController.class.getSimpleName();
 	private static final LookController INSTANCE = new LookController();
+
+	private OnBackpackLookCompleteListener onBackpackLookCompleteListener;
 
 	private LookController() {
 	}
@@ -251,16 +256,18 @@ public final class LookController {
 		return newLookData;
 	}
 
-	private void updateLookAdapter(String name, String fileName, List<LookData> lookDataList, LookFragment fragment, LookData.LookDataType lookDataType) {
+	public void updateLookAdapter(String name, String fileName, List<LookData> lookDataList, LookFragment fragment) {
+		updateLookAdapter(name, fileName, lookDataList, fragment, false);
+	}
+
+	private void updateLookAdapter(String name, String fileName, List<LookData> lookDataList, LookFragment fragment,
+			boolean isDroneVideo) {
 		LookData lookData;
 
-		switch (lookDataType) {
-			case DRONE_VIDEO:
-				lookData = new DroneVideoLookData();
-				break;
-			default:
-				lookData = new LookData();
-				break;
+		if (isDroneVideo) {
+			lookData = new DroneVideoLookData();
+		} else {
+			lookData = new LookData();
 		}
 
 		lookData.setLookFilename(fileName);
@@ -269,16 +276,11 @@ public final class LookController {
 		fragment.updateLookAdapter(lookData);
 	}
 
-	private void updateLookAdapter(String name, String fileName, List<LookData> lookDataList, LookFragment fragment) {
-
-		updateLookAdapter(name, fileName, lookDataList, fragment, LookData.LookDataType.IMAGE);
-	}
-
-	public void loadDroneVideoImageToProject(String defaultImageName, int imageId, Activity activity, List<LookData> lookDataList, LookFragment fragment) {
+	public void loadDroneVideoImageToProject(String defaultImageName, int imageId, Activity activity, List<LookData>
+			lookDataList, LookFragment fragment) {
 		try {
-
 			File imageFile = StorageHandler.getInstance().copyImageFromResourceToCatroid(activity, imageId, defaultImageName);
-			updateLookAdapter(defaultImageName, imageFile.getName(), lookDataList, fragment, LookData.LookDataType.DRONE_VIDEO);
+			updateLookAdapter(defaultImageName, imageFile.getName(), lookDataList, fragment, true);
 		} catch (IOException e) {
 			Utils.showErrorDialog(activity, R.string.error_load_image);
 		}
@@ -290,7 +292,6 @@ public final class LookController {
 	private void copyImageToCatroid(String originalImagePath, Activity activity, List<LookData> lookDataList,
 									LookFragment fragment) {
 		try {
-
 			int[] imageDimensions = ImageEditing.getImageDimensions(originalImagePath);
 
 			if (imageDimensions[0] < 0 || imageDimensions[1] < 0) {
@@ -458,8 +459,7 @@ public final class LookController {
 									.parse(Constants.POCKET_PAINT_DOWNLOAD_LINK));
 							activity.startActivity(downloadPocketPaintIntent);
 						}
-					})
-					.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+					}).setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
 						@Override
 						public void onClick(DialogInterface dialog, int id) {
 							dialog.cancel();
@@ -512,11 +512,87 @@ public final class LookController {
 		activity.sendBroadcast(new Intent(ScriptActivity.ACTION_LOOK_DELETED));
 	}
 
-	public LookData backPackLook(LookData currentLookData, boolean addToHiddenBackpack) {
-		if (addToHiddenBackpack && BackPackListManager.getInstance().backPackedLooksContain(currentLookData)) {
+	public boolean checkLookReplaceInBackpack(List<LookData> currentLookDataList) {
+		boolean looksAlreadyInBackpack = false;
+		for (LookData lookData : currentLookDataList) {
+			looksAlreadyInBackpack = checkLookReplaceInBackpack(lookData);
+			if (looksAlreadyInBackpack) {
+				return looksAlreadyInBackpack;
+			}
+		}
+		return looksAlreadyInBackpack;
+	}
+
+	public boolean checkLookReplaceInBackpack(LookData currentLookData) {
+		return BackPackListManager.getInstance().backPackedLooksContain(currentLookData, true);
+	}
+
+	public void showBackPackReplaceDialog(final List<LookData> currentLookDataList, final Context context) {
+		Resources resources = context.getResources();
+		String replaceLookMessage = resources.getString(R.string.backpack_replace_look_multiple);
+
+		AlertDialog dialog = new CustomAlertDialogBuilder(context)
+				.setTitle(R.string.backpack)
+				.setMessage(replaceLookMessage)
+				.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						for (LookData currentLookData : currentLookDataList) {
+							backPackVisibleLook(currentLookData);
+						}
+						onBackpackLookCompleteListener.onBackpackLookComplete(true);
+						dialog.dismiss();
+					}
+				}).setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						onBackpackLookCompleteListener.onBackpackLookComplete(false);
+						dialog.dismiss();
+					}
+				}).create();
+		dialog.setCanceledOnTouchOutside(true);
+		dialog.show();
+	}
+
+	public void showBackPackReplaceDialog(final LookData currentLookData, final Context context) {
+		Resources resources = context.getResources();
+		String replaceLookMessage = resources.getString(R.string.backpack_replace_look, currentLookData.getLookName());
+
+		AlertDialog dialog = new CustomAlertDialogBuilder(context)
+				.setTitle(R.string.backpack)
+				.setMessage(replaceLookMessage)
+				.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						backPackVisibleLook(currentLookData);
+						onBackpackLookCompleteListener.onBackpackLookComplete(true);
+						dialog.dismiss();
+					}
+				}).setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.dismiss();
+					}
+				}).create();
+		dialog.setCanceledOnTouchOutside(true);
+		dialog.show();
+	}
+
+	public void backPackVisibleLook(LookData currentLookData) {
+		String lookDataName = currentLookData.getLookName();
+		BackPackListManager.getInstance().removeItemFromLookBackPackByLookName(lookDataName);
+		backPack(currentLookData, lookDataName, false);
+	}
+
+	public LookData backPackHiddenLook(LookData currentLookData) {
+		if (BackPackListManager.getInstance().backPackedLooksContain(currentLookData, false)) {
 			return currentLookData;
 		}
 		String newLookDataName = Utils.getUniqueLookName(currentLookData, true);
+		return backPack(currentLookData, newLookDataName, true);
+	}
+
+	public LookData backPack(LookData currentLookData, String newLookDataName, boolean addToHiddenBackpack) {
 		String existingFileNameInBackPackDirectory = lookFileAlreadyInBackPackDirectory(currentLookData);
 		if (existingFileNameInBackPackDirectory == null) {
 			copyLookBackPack(currentLookData, newLookDataName, false);
@@ -622,5 +698,13 @@ public final class LookController {
 
 		scriptActivity.setIsLookFragmentFromSetLookBrickNewFalse();
 		scriptActivity.setIsLookFragmentHandleAddButtonHandled(false);
+	}
+
+	public void setOnBackpackLookCompleteListener(OnBackpackLookCompleteListener listener) {
+		onBackpackLookCompleteListener = listener;
+	}
+
+	public interface OnBackpackLookCompleteListener {
+		void onBackpackLookComplete(boolean startBackpackActivity);
 	}
 }

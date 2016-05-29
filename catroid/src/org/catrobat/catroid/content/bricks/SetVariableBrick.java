@@ -43,7 +43,6 @@ import org.catrobat.catroid.R;
 import org.catrobat.catroid.common.BrickValues;
 import org.catrobat.catroid.content.Project;
 import org.catrobat.catroid.content.Sprite;
-import org.catrobat.catroid.content.actions.ExtendedActions;
 import org.catrobat.catroid.formulaeditor.Formula;
 import org.catrobat.catroid.formulaeditor.FormulaElement;
 import org.catrobat.catroid.formulaeditor.InternToExternGenerator;
@@ -104,8 +103,8 @@ public class SetVariableBrick extends UserVariableBrick {
 
 	@Override
 	public List<SequenceAction> addActionToSequence(Sprite sprite, SequenceAction sequence) {
-		sequence.addAction(ExtendedActions.setVariable(sprite, getFormulaWithBrickField(BrickField.VARIABLE),
-				userVariable));
+		sequence.addAction(sprite.getActionFactory().createSetVariableAction(sprite,
+				getFormulaWithBrickField(BrickField.VARIABLE), userVariable));
 		return null;
 	}
 
@@ -185,6 +184,9 @@ public class SetVariableBrick extends UserVariableBrick {
 				if (position == 0 && ((UserVariableAdapterWrapper) parent.getAdapter()).isTouchInDropDownView()) {
 					NewDataDialog dialog = new NewDataDialog((Spinner) parent, NewDataDialog.DialogType.USER_VARIABLE);
 					dialog.addVariableDialogListener(SetVariableBrick.this);
+					int spinnerPos = ((UserVariableAdapterWrapper) parent.getAdapter())
+							.getPositionOfItem(userVariable);
+					dialog.setUserVariableIfCancel(spinnerPos);
 					dialog.show(((Activity) view.getContext()).getFragmentManager(),
 							NewDataDialog.DIALOG_FRAGMENT_TAG);
 				}
@@ -263,7 +265,10 @@ public class SetVariableBrick extends UserVariableBrick {
 	public SetVariableBrick copyBrickForSprite(Sprite sprite) {
 		Project currentProject = ProjectManager.getInstance().getCurrentProject();
 		SetVariableBrick copyBrick = clone();
-		copyBrick.userVariable = currentProject.getDataContainer().getUserVariable(userVariable.getName(), sprite);
+		if (this.userVariable != null) {
+			copyBrick.userVariable = currentProject.getDataContainer().getUserVariable(userVariable.getName(), sprite);
+		}
+
 		return copyBrick;
 	}
 

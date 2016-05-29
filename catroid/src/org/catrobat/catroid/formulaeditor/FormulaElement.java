@@ -31,6 +31,8 @@ import org.catrobat.catroid.common.ServiceProvider;
 import org.catrobat.catroid.content.Sprite;
 import org.catrobat.catroid.content.bricks.Brick;
 import org.catrobat.catroid.devices.arduino.Arduino;
+import org.catrobat.catroid.devices.raspberrypi.RPiSocketConnection;
+import org.catrobat.catroid.devices.raspberrypi.RaspberryPiService;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -390,6 +392,16 @@ public class FormulaElement implements Serializable {
 					return arduinoAnalog.getAnalogArduinoPin(doubleValueOfLeftChild.intValue());
 				}
 				break;
+			case RASPIDIGITAL:
+				RPiSocketConnection connection = RaspberryPiService.getInstance().connection;
+				int pin = doubleValueOfLeftChild.intValue();
+				// TODO check if pin is
+				try {
+					return connection.getPin(pin) ? 1d : 0d;
+				} catch (Exception e) {
+					Log.e(getClass().getSimpleName(), "RPi: exception during getPin: " + e);
+				}
+				break;
 			case LIST_ITEM:
 				return interpretFunctionListItem(left, sprite);
 			case CONTAINS:
@@ -689,6 +701,9 @@ public class FormulaElement implements Serializable {
 			case OBJECT_BRIGHTNESS:
 				returnValue = (double) sprite.look.getBrightnessInUserInterfaceDimensionUnit();
 				break;
+			case OBJECT_COLOR:
+				returnValue = (double) sprite.look.getColorInUserInterfaceDimensionUnit();
+				break;
 			case OBJECT_TRANSPARENCY:
 				returnValue = (double) sprite.look.getTransparencyInUserInterfaceDimensionUnit();
 				break;
@@ -706,6 +721,15 @@ public class FormulaElement implements Serializable {
 				break;
 			case OBJECT_Y:
 				returnValue = (double) sprite.look.getYInUserInterfaceDimensionUnit();
+				break;
+			case OBJECT_ANGULAR_VELOCITY:
+				returnValue = (double) sprite.look.getAngularVelocityInUserInterfaceDimensionUnit();
+				break;
+			case OBJECT_X_VELOCITY:
+				returnValue = (double) sprite.look.getXVelocityInUserInterfaceDimensionUnit();
+				break;
+			case OBJECT_Y_VELOCITY:
+				returnValue = (double) sprite.look.getYVelocityInUserInterfaceDimensionUnit();
 				break;
 		}
 		return returnValue;
@@ -911,6 +935,9 @@ public class FormulaElement implements Serializable {
 				case ARDUINOANALOG:
 				case ARDUINODIGITAL:
 					resources |= Brick.BLUETOOTH_SENSORS_ARDUINO;
+					break;
+				case RASPIDIGITAL:
+					resources |= Brick.SOCKET_RASPI;
 					break;
 			}
 		}

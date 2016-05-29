@@ -32,6 +32,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class InternToExternGenerator {
+	private static final String TAG = InternToExternGenerator.class.getSimpleName();
 
 	private String generatedExternFormulaString;
 	private ExternInternRepresentationMapping generatedExternInternRepresentationMapping;
@@ -88,6 +89,8 @@ public class InternToExternGenerator {
 				.formula_editor_function_arduino_read_pin_value_digital);
 		INTERN_EXTERN_LANGUAGE_CONVERTER_MAP.put(Functions.ARDUINOANALOG.name(),
 				R.string.formula_editor_function_arduino_read_pin_value_analog);
+		INTERN_EXTERN_LANGUAGE_CONVERTER_MAP.put(Functions.RASPIDIGITAL.name(), R.string
+				.formula_editor_function_raspi_read_pin_value_digital);
 		INTERN_EXTERN_LANGUAGE_CONVERTER_MAP.put(Functions.LIST_ITEM.name(), R.string.formula_editor_function_list_item);
 		INTERN_EXTERN_LANGUAGE_CONVERTER_MAP.put(Functions.CONTAINS.name(), R.string.formula_editor_function_contains);
 		INTERN_EXTERN_LANGUAGE_CONVERTER_MAP.put(Sensors.X_ACCELERATION.name(),
@@ -127,10 +130,18 @@ public class InternToExternGenerator {
 				R.string.formula_editor_object_transparency);
 		INTERN_EXTERN_LANGUAGE_CONVERTER_MAP.put(Sensors.OBJECT_BRIGHTNESS.name(),
 				R.string.formula_editor_object_brightness);
+		INTERN_EXTERN_LANGUAGE_CONVERTER_MAP.put(Sensors.OBJECT_COLOR.name(), R.string.formula_editor_object_color);
 		INTERN_EXTERN_LANGUAGE_CONVERTER_MAP.put(Sensors.OBJECT_SIZE.name(), R.string.formula_editor_object_size);
 		INTERN_EXTERN_LANGUAGE_CONVERTER_MAP.put(Sensors.OBJECT_ROTATION.name(),
 				R.string.formula_editor_object_rotation);
 		INTERN_EXTERN_LANGUAGE_CONVERTER_MAP.put(Sensors.OBJECT_LAYER.name(), R.string.formula_editor_object_layer);
+
+		INTERN_EXTERN_LANGUAGE_CONVERTER_MAP.put(Sensors.OBJECT_X_VELOCITY.name(),
+				R.string.formula_editor_object_x_velocity);
+		INTERN_EXTERN_LANGUAGE_CONVERTER_MAP.put(Sensors.OBJECT_Y_VELOCITY.name(),
+				R.string.formula_editor_object_y_velocity);
+		INTERN_EXTERN_LANGUAGE_CONVERTER_MAP.put(Sensors.OBJECT_ANGULAR_VELOCITY.name(),
+				R.string.formula_editor_object_angular_velocity);
 
 		INTERN_EXTERN_LANGUAGE_CONVERTER_MAP.put(Operators.LOGICAL_NOT.name(), R.string.formula_editor_logic_not);
 		INTERN_EXTERN_LANGUAGE_CONVERTER_MAP.put(Operators.NOT_EQUAL.name(), R.string.formula_editor_logic_notequal);
@@ -154,7 +165,7 @@ public class InternToExternGenerator {
 	}
 
 	public void generateExternStringAndMapping(List<InternToken> internTokenFormula) {
-		Log.i("info", "generateExternStringAndMapping:enter");
+		Log.i(TAG, "generateExternStringAndMapping:enter");
 
 		List<InternToken> internTokenList = new LinkedList<InternToken>();
 

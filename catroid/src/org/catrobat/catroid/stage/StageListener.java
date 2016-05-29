@@ -34,8 +34,6 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.FPSLogger;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -62,6 +60,11 @@ import org.catrobat.catroid.content.Project;
 import org.catrobat.catroid.content.Sprite;
 import org.catrobat.catroid.facedetection.FaceDetectionHandler;
 import org.catrobat.catroid.io.SoundManager;
+import org.catrobat.catroid.physics.PhysicsDebugSettings;
+import org.catrobat.catroid.physics.PhysicsLook;
+import org.catrobat.catroid.physics.PhysicsObject;
+import org.catrobat.catroid.physics.PhysicsWorld;
+import org.catrobat.catroid.physics.shapebuilder.PhysicsShapeBuilder;
 import org.catrobat.catroid.ui.dialogs.StageDialog;
 import org.catrobat.catroid.utils.FlashUtil;
 import org.catrobat.catroid.utils.Utils;
@@ -91,8 +94,8 @@ public class StageListener implements ApplicationListener {
 
 	private float deltaActionTimeDivisor = 10f;
 	public static final String SCREENSHOT_AUTOMATIC_FILE_NAME = "automatic_screenshot"
-			+ Constants.IMAGE_STANDARD_EXTENTION;
-	public static final String SCREENSHOT_MANUAL_FILE_NAME = "manual_screenshot" + Constants.IMAGE_STANDARD_EXTENTION;
+			+ Constants.IMAGE_STANDARD_EXTENSION;
+	public static final String SCREENSHOT_MANUAL_FILE_NAME = "manual_screenshot" + Constants.IMAGE_STANDARD_EXTENSION;
 	private FPSLogger fpsLogger;
 
 	private Stage stage;
@@ -115,6 +118,8 @@ public class StageListener implements ApplicationListener {
 	private boolean skipFirstFrameForAutomaticScreenshot;
 
 	private Project project;
+
+	private PhysicsWorld physicsWorld;
 
 	private OrthographicCamera camera;
 	private Batch batch;
@@ -148,7 +153,6 @@ public class StageListener implements ApplicationListener {
 	public boolean axesOn = false;
 
 	private byte[] thumbnail;
-	private LookData whiteBackground = null;
 
 	StageListener() {
 	}
@@ -174,10 +178,12 @@ public class StageListener implements ApplicationListener {
 		stage = new Stage(viewPort, batch);
 		initScreenMode();
 
+		physicsWorld = project.resetPhysicsWorld();
+
 		sprites = project.getSpriteList();
 		for (Sprite sprite : sprites) {
 			sprite.resetSprite();
-			sprite.look.createBrightnessContrastShader();
+			sprite.look.createBrightnessContrastHueShader();
 			stage.addActor(sprite.look);
 			sprite.resume();
 		}
@@ -202,8 +208,6 @@ public class StageListener implements ApplicationListener {
 		if (checkIfAutomaticScreenshotShouldBeTaken) {
 			makeAutomaticScreenshot = project.manualScreenshotExists(SCREENSHOT_MANUAL_FILE_NAME);
 		}
-
-		whiteBackground = createWhiteBackgroundLookData();
 	}
 
 	void menuResume() {
@@ -285,13 +289,18 @@ public class StageListener implements ApplicationListener {
 		if (thumbnail != null && !makeAutomaticScreenshot) {
 			saveScreenshot(thumbnail, SCREENSHOT_AUTOMATIC_FILE_NAME);
 		}
+		PhysicsShapeBuilder.getInstance().reset();
 		CameraManager.getInstance().setToDefaultCamera();
 	}
 
 	@Override
 	public void render() {
+		if (CameraManager.getInstance().getState() == CameraManager.CameraState.previewRunning) {
+			Gdx.gl20.glClearColor(0f, 0f, 0f, 0f);
+		} else {
+			Gdx.gl20.glClearColor(1f, 1f, 1f, 0f);
+		}
 		Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		Gdx.gl20.glClearColor(0f, 0f, 0f, 0f);
 		if (reloadProject) {
 			int spriteSize = sprites.size();
 			for (int i = 0; i < spriteSize; i++) {
@@ -300,15 +309,14 @@ public class StageListener implements ApplicationListener {
 			stage.clear();
 			SoundManager.getInstance().clear();
 
-			if (spriteSize > 0) {
-				sprites.get(0).look.setLookData(whiteBackground);
-			}
+			physicsWorld = project.resetPhysicsWorld();
 
 			Sprite sprite;
+
 			for (int i = 0; i < spriteSize; i++) {
 				sprite = sprites.get(i);
 				sprite.resetSprite();
-				sprite.look.createBrightnessContrastShader();
+				sprite.look.createBrightnessContrastHueShader();
 				stage.addActor(sprite.look);
 				sprite.pause();
 			}
@@ -327,9 +335,6 @@ public class StageListener implements ApplicationListener {
 		if (firstStart) {
 			ProjectManager.getInstance().getCurrentProject().getDataContainer().resetAllDataObjects();
 			int spriteSize = sprites.size();
-			if (spriteSize > 0) {
-				sprites.get(0).look.setLookData(whiteBackground);
-			}
 
 			Map<String, List<String>> scriptActions = new HashMap<String, List<String>>();
 			for (int currentSprite = 0; currentSprite < spriteSize; currentSprite++) {
@@ -362,11 +367,13 @@ public class StageListener implements ApplicationListener {
 			 * future EMMA - update will fix the bugs.
 			 */
 			if (!DYNAMIC_SAMPLING_RATE_FOR_ACTIONS) {
+				physicsWorld.step(deltaTime);
 				stage.act(deltaTime);
 			} else {
 				float optimizedDeltaTime = deltaTime / deltaActionTimeDivisor;
 				long timeBeforeActionsUpdate = SystemClock.uptimeMillis();
 				while (deltaTime > 0f) {
+					physicsWorld.step(optimizedDeltaTime);
 					stage.act(optimizedDeltaTime);
 					deltaTime -= optimizedDeltaTime;
 				}
@@ -383,8 +390,6 @@ public class StageListener implements ApplicationListener {
 
 		if (!finished) {
 			stage.draw();
-
-			updateCameraEvents();
 		}
 
 		if (makeAutomaticScreenshot) {
@@ -407,6 +412,14 @@ public class StageListener implements ApplicationListener {
 			drawAxes();
 		}
 
+		if (PhysicsDebugSettings.Render.RENDER_PHYSIC_OBJECT_LABELING) {
+			printPhysicsLabelOnScreen();
+		}
+
+		if (PhysicsDebugSettings.Render.RENDER_COLLISION_FRAMES && !finished) {
+			physicsWorld.render(camera.combined);
+		}
+
 		if (DEBUG) {
 			fpsLogger.log();
 		}
@@ -414,23 +427,6 @@ public class StageListener implements ApplicationListener {
 		if (makeTestPixels) {
 			testPixels = ScreenUtils.getFrameBufferPixels(testX, testY, testWidth, testHeight, false);
 			makeTestPixels = false;
-		}
-	}
-
-	private void updateCameraEvents() {
-		if (CameraManager.getInstance().isUpdateBackgroundToTransparent()) {
-			//Set the transparency of the Background to 100% if there was no background image specified or 50% if so
-			if (sprites.get(0).look.getLookData().equals(whiteBackground)) {
-				sprites.get(0).look.setTransparencyInUserInterfaceDimensionUnit(99f);
-			} else {
-				sprites.get(0).look.setTransparencyInUserInterfaceDimensionUnit(50f);
-			}
-			CameraManager.getInstance().setUpdateBackgroundToTransparent(false);
-		}
-
-		if (CameraManager.getInstance().isUpdateBackgroundToNotTransparent()) {
-			sprites.get(0).look.setTransparencyInUserInterfaceDimensionUnit(0f);
-			CameraManager.getInstance().setUpdateBackgroundToNotTransparent(false);
 		}
 	}
 
@@ -457,6 +453,9 @@ public class StageListener implements ApplicationListener {
 		}
 		if (currentActions.get(Constants.BROADCAST_NOTIFY_ACTION) != null) {
 			actions.addAll(currentActions.get(Constants.BROADCAST_NOTIFY_ACTION));
+		}
+		if (currentActions.get(Constants.RASPI_SCRIPT) != null) {
+			actions.addAll(currentActions.get(Constants.RASPI_SCRIPT));
 		}
 		for (String action : actions) {
 			for (String actionOfLook : actions) {
@@ -494,6 +493,27 @@ public class StageListener implements ApplicationListener {
 			return true;
 		}
 		return false;
+	}
+
+	private void printPhysicsLabelOnScreen() {
+		PhysicsObject tempPhysicsObject;
+		final int fontOffset = 5;
+		batch.setProjectionMatrix(camera.combined);
+		batch.begin();
+		for (Sprite sprite : sprites) {
+			if (sprite.look instanceof PhysicsLook) {
+				tempPhysicsObject = physicsWorld.getPhysicsObject(sprite);
+				font.draw(batch, "velocity_x: " + tempPhysicsObject.getVelocity().x, tempPhysicsObject.getX(),
+						tempPhysicsObject.getY());
+				font.draw(batch, "velocity_y: " + tempPhysicsObject.getVelocity().y, tempPhysicsObject.getX(),
+						tempPhysicsObject.getY() + font.getXHeight() + fontOffset);
+				font.draw(batch, "angular velocity: " + tempPhysicsObject.getRotationSpeed(), tempPhysicsObject.getX(),
+						tempPhysicsObject.getY() + font.getXHeight() * 2 + fontOffset * 2);
+				font.draw(batch, "direction: " + tempPhysicsObject.getDirection(), tempPhysicsObject.getX(),
+						tempPhysicsObject.getY() + font.getXHeight() * 3 + fontOffset * 3);
+			}
+		}
+		batch.end();
 	}
 
 	private void drawAxes() {
@@ -632,18 +652,6 @@ public class StageListener implements ApplicationListener {
 		viewPort.update(ScreenValues.SCREEN_WIDTH, ScreenValues.SCREEN_HEIGHT, false);
 		camera.position.set(0, 0, 0);
 		camera.update();
-	}
-
-	private LookData createWhiteBackgroundLookData() {
-		LookData whiteBackground = new LookData();
-		Pixmap whiteBackgroundPixmap = new Pixmap((int) virtualWidth, (int) virtualHeight, Format.RGBA8888);
-		whiteBackgroundPixmap.setColor(1, 1, 1, 1);
-		whiteBackgroundPixmap.fill();
-		whiteBackground.setPixmap(whiteBackgroundPixmap);
-		whiteBackground.setTextureRegion();
-		whiteBackground.setLookFilename("white");
-		whiteBackground.setLookName("white");
-		return whiteBackground;
 	}
 
 	private void disposeTextures() {

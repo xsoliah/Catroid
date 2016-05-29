@@ -46,8 +46,8 @@ import org.catrobat.catroid.ProjectManager;
 import org.catrobat.catroid.R;
 import org.catrobat.catroid.common.LookData;
 import org.catrobat.catroid.content.Sprite;
-import org.catrobat.catroid.content.actions.ExtendedActions;
 import org.catrobat.catroid.ui.ScriptActivity;
+import org.catrobat.catroid.ui.controller.LookController;
 import org.catrobat.catroid.ui.fragment.LookFragment;
 import org.catrobat.catroid.ui.fragment.LookFragment.OnLookDataListChangedAfterNewListener;
 
@@ -220,7 +220,7 @@ public class SetLookBrick extends BrickBaseType implements OnLookDataListChanged
 
 	@Override
 	public List<SequenceAction> addActionToSequence(Sprite sprite, SequenceAction sequence) {
-		sequence.addAction(ExtendedActions.setLook(sprite, look));
+		sequence.addAction(sprite.getActionFactory().createSetLookAction(sprite, look));
 		return null;
 	}
 
@@ -351,5 +351,14 @@ public class SetLookBrick extends BrickBaseType implements OnLookDataListChanged
 	public void onLookDataListChangedAfterNew(LookData lookData) {
 		look = lookData;
 		oldSelectedLook = lookData;
+	}
+
+	@Override
+	public void storeDataForBackPack(Sprite sprite) {
+		LookData backPackedLookData = LookController.getInstance().backPackHiddenLook(this.getLook());
+		setLook(backPackedLookData);
+		if (sprite != null && !sprite.getLookDataList().contains(backPackedLookData)) {
+			sprite.getLookDataList().add(backPackedLookData);
+		}
 	}
 }
